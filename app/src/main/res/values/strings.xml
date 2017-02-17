@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">SOS Blood</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="new_user_text"><u>I am a new user</u></string>
+    <string name="auto_detect"><u>Auto detect</u></string>
+    <string name="choose_loc"><u>Choose from google map</u></string>
+    <string name="terms_of_service"><u><b>Terms of Service</b></u></string>
+    <string name="forgot_password"><u>Forgot Password?</u></string>
+    <string name="invite_friends_text"><u>Invite friends to SOS Blood</u></string>
+    <string name="same_as_mine"><u>Same as mine</u></string>
+
+    <string-array name="blood_group_entries">
+
+        <item>O+</item>
+        <item>O-</item>
+        <item>A+</item>
+        <item>A-</item>
+        <item>B+</item>
+        <item>B-</item>
+        <item>AB+</item>
+        <item>AB-</item>
+
+    </string-array>
+
+    <string-array name="sorting_donor_entries">
+
+        <item>Distance from me</item>
+        <item>Age (low to high)</item>
+        <item>Age (high to low)</item>
+
+    </string-array>
+
+    <string name="facebook_app_id">1831549683755211</string>
+    <string name="fb_login_protocol_scheme">fb1831549683755211</string>
+    <string name="service_unavailable">Service not available</string>
+    <string name="invalid_lat_lng">Invalid Lat Lng</string>
+    <string name="no_address_found">No addresses found</string>
+</resources>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:animateLayoutChanges="true"
+        android:id="@+id/parent_lin_lay_id">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="I need blood for"
+            android:textColor="#000"
+            android:layout_gravity="center_horizontal"
+            android:textAlignment="center"
+            android:textSize="17sp"/>
+
+        <RadioGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:id="@+id/request_radio_group_id">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Myself"
+                android:id="@+id/myself_radio_button_id"/>
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Someone else"
+                android:id="@+id/someone_else_radio_button_id"/>
+
+        </RadioGroup>
+
+        <com.example.sosblood.others.MySpinner
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:id="@+id/spinner_blood_group_id"
+            android:spinnerMode="dialog"
+            android:layout_marginTop="10dp"/>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:id="@+id/rel_lay_region_id">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/region_input_lay_id"
+                app:errorEnabled="true"
+                android:focusableInTouchMode="true">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/region_edittext_id"
+                    android:inputType="text"
+                    style="@android:style/Widget.EditText"
+                    android:hint=" Region/City" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/same_as_mine"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:textColor="@color/link_text_color"
+                android:clickable="true"
+                android:id="@+id/same_as_mine_textview_id"/>
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/region_progress_bar_id"
+                android:layout_toLeftOf="@+id/same_as_mine_textview_id"
+                android:layout_marginRight="10dp"
+                android:layout_centerVertical="true"
+                android:visibility="gone"
+                style="?android:attr/progressBarStyleSmall"/>
+
+        </RelativeLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/age_input_lay_id"
+            app:errorEnabled="true"
+            android:focusableInTouchMode="true">
+
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/age_edittext_id"
+                android:inputType="number"
+                style="@android:style/Widget.EditText"
+                android:hint=" Age (in years)"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/note_input_lay_id"
+            android:focusableInTouchMode="true">
+
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:id="@+id/note_edittext_id"
+                android:inputType="textMultiLine"
+                android:background="@android:drawable/edit_text"
+                android:hint=" Note(optional)..."
+                android:gravity="start" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/rel_lay_button_id">
+
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Request"
+                android:id="@+id/request_button_id"
+                android:textColor="#fff"
+                android:textSize="16sp"
+                android:layout_alignParentBottom="true"
+                android:background="@drawable/button_bg"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</ScrollView>

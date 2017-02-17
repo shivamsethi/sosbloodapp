@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:titleTextColor="#fff"
+        android:background="@color/theme_red"
+        android:id="@+id/login_toolbar_id"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/phone_input_lay_id"
+                android:layout_marginTop="100dp"
+                app:errorEnabled="true"
+                android:focusableInTouchMode="true">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/phone_edittext_id"
+                    android:inputType="text"
+                    style="@android:style/Widget.EditText"
+                    android:hint=" Phone/Email"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:passwordToggleEnabled="true"
+                app:counterEnabled="true"
+                app:errorEnabled="true"
+                android:layout_marginTop="0dp"
+                android:id="@+id/password_input_lay_id">
+
+                <android.support.design.widget.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/password_edittext_id"
+                    android:inputType="textPassword"
+                    style="@android:style/Widget.EditText"
+                    android:hint=" Password"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/forgot_password"
+                android:textColor="@color/link_text_color"
+                android:layout_gravity="end"
+                android:clickable="true"
+                android:id="@+id/forgot_pass_textview_id"
+                android:onClick="actTextViewForgetPassword"/>
+
+            <Button
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="Login"
+                android:textSize="17sp"
+                android:textColor="#fff"
+                android:layout_marginTop="15dp"
+                android:layout_gravity="center_horizontal"
+                android:shadowColor="#5C4D59"
+                android:shadowDx="0"
+                android:shadowDy="0"
+                android:shadowRadius="5"
+                android:onClick="actButtonLogin"
+                android:background="@drawable/button_bg"/>
+
+            <View
+                android:layout_width="240dp"
+                android:layout_height="2dp"
+                android:background="#555"
+                android:layout_marginTop="50dp"
+                android:layout_gravity="center_horizontal"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/new_user_text"
+                android:textSize="15sp"
+                android:textColor="@color/new_user_color_selector"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="18dp"
+                android:clickable="true"
+                android:id="@+id/new_user_text_view_id"
+                android:onClick="actTextViewNewUser"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

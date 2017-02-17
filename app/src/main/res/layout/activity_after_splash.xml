@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:id="@+id/dp_image_view_id" />
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/dp_progress_bar_id"/>
+
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#000"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="4dp"
+        android:textSize="21sp"
+        android:id="@+id/name_textview_id"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/email_textview_id"
+        android:textSize="15sp"/>
+
+    <com.example.sosblood.others.MySpinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner_blood_group_id"
+        android:spinnerMode="dialog"
+        android:layout_marginTop="45dp"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/region_input_lay_id"
+            app:errorEnabled="true"
+            android:focusableInTouchMode="true"
+            android:descendantFocusability="afterDescendants">
+
+            <android.support.design.widget.TextInputEditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/region_edittext_id"
+                android:inputType="text"
+                style="@android:style/Widget.EditText"
+                android:hint=" Region/City"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <ProgressBar
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:id="@+id/region_progress_bar_id"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="20dp"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/theme_red"
+            style="?android:attr/buttonBarStyle"
+            android:orientation="horizontal">
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bottom_bar_bg"
+                android:text="BACK"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="#fff"
+                android:onClick="actButtonBack"/>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="38dp"
+                android:background="@color/white"
+                android:layout_gravity="center_vertical"/>
+
+            <Button
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/bottom_bar_bg"
+                android:text="NEXT"
+                android:textSize="14sp"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_weight="1"
+                android:textColor="#fff"
+                android:onClick="actButtonNext"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>

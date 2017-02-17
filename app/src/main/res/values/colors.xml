@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#353535</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="white">#ffffff</color>
+    <color name="red">#ff0000</color>
+    <color name="tab_widget">#f2f2f2</color>
+    <color name="tab_widget_selected">#998686</color>
+    <color name="fab">#424C24</color>
+    <color name="fab_selected">#5C663E</color>
+    <color name="text_link_blue">#0066ff</color>
+    <color name="text_link_red">#d81121</color>
+    <color name="filter_lay">#eee</color>
+    <color name="filter_lay_pressed">#aaa</color>
+    <color name="theme_red">#db3236</color>
+    <color name="theme_red_selected">#af3236</color>
+    <color name="splash_signup">#148943</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="light_red">#d6afaf</color>
+    <color name="light_green">#8fc992</color>
+</resources>
