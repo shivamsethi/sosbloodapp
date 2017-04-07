@@ -13,6 +13,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,6 +21,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.sosblood.R;
+import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MySpinner;
 import com.example.sosblood.utils.CustomSpinnerAdapter;
 import com.google.android.gms.common.ConnectionResult;
@@ -36,7 +38,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 import me.nereo.multi_image_selector.MultiImageSelector;
@@ -71,7 +73,13 @@ public class SignUpActivity extends AppCompatActivity implements GoogleApiClient
 
         progress_bar_auto_detect.getIndeterminateDrawable().setColorFilter(Color.RED, PorterDuff.Mode.MULTIPLY);
 
-        List<String> blood_groups= Arrays.asList(getResources().getStringArray(R.array.blood_group_entries));
+        List<String> blood_groups=new ArrayList<>();
+        SparseArray<String> bg_array=((MyApplication)this.getApplication()).getBloodGroups();
+        for(int i=0;i<bg_array.size();i++)
+        {
+            blood_groups.add(bg_array.get(i+1));
+            Log.v("yo",blood_groups.get(i)+" by "+i);
+        }
         CustomSpinnerAdapter adapter=new CustomSpinnerAdapter(this,blood_groups,"Select Blood Group");
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         blood_group_spinner.setAdapter(adapter);

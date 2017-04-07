@@ -17,5 +17,4 @@ public final class MyConstants {
     public static final String SHARED_PREFS_USER_KEY=PACKAGE_NAME+".SHARED_PREFS_USER";
 
     public static final String SHARED_PREFS_EXTRA_KEY=PACKAGE_NAME+".SHARED_PREFS_EXTRA";
-
 }

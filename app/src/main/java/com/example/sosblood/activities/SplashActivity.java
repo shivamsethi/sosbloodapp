@@ -2,11 +2,13 @@ package com.example.sosblood.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -62,6 +64,7 @@ public class SplashActivity extends AppCompatActivity {
     private String profile_pic_url;
     private ProgressDialog dialog;
 
+
     String[] carousel_texts={"Find blood donors with our powerful algorithms","Be a donor and do noble work","Can easily connect with facebook account","Take SOS where ever you go"};
 
     @Override
@@ -69,8 +72,11 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         FacebookSdk.sdkInitialize(getApplicationContext());
-        /*if(AccessToken.getCurrentAccessToken()!=null)
-            startActivity(new Intent(this,MainActivity.class));*/
+        if(AccessToken.getCurrentAccessToken()!=null)
+        {
+            /*startActivity(new Intent(this,MainActivity.class));
+            finish();*/
+        }
 
         setContentView(R.layout.activity_splash);
 
@@ -83,11 +89,6 @@ public class SplashActivity extends AppCompatActivity {
         dialog.setCancelable(false);
 
         call_back_manager=CallbackManager.Factory.create();
-
-
-        if(AccessToken.getCurrentAccessToken()!=null)
-            loginToServer();
-
 
         fb_login_button.setReadPermissions(Arrays.asList("email","user_birthday"));
         fb_login_button.registerCallback(call_back_manager, new FacebookCallback<LoginResult>() {
@@ -108,13 +109,12 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onCancel() {
-
             }
 
             @Override
             public void onError(FacebookException error) {
-                Toast.makeText(SplashActivity.this,"Error "+error.toString()+error.getMessage()+error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-                Log.v("yo","Error "+error.toString()+error.getMessage()+error.getLocalizedMessage());
+                Toast.makeText(SplashActivity.this,error.toString()+"\n"+error.getMessage()+"\n"+error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
+                Log.v("yo","Error "+error.toString()+"\n"+error.getMessage()+"\n"+error.getLocalizedMessage());
                 error.printStackTrace();
 
             }
@@ -131,7 +131,6 @@ public class SplashActivity extends AppCompatActivity {
                 if(oldProfile==null && currentProfile!=null)
                 {
                     profile_pic_url=currentProfile.getProfilePictureUri(150,150).toString();
-
                 }
             }
         };
@@ -172,8 +171,12 @@ public class SplashActivity extends AppCompatActivity {
                 return view;
             }
         });
-    }
 
+        if(AccessToken.getCurrentAccessToken()!=null)
+        {
+            loginToServer();
+        }
+    }
 
     private void loginToServer()
     {
@@ -199,25 +202,28 @@ public class SplashActivity extends AppCompatActivity {
                 Intent intent=new Intent(SplashActivity.this,AfterSplashActivity.class);
                 intent.putExtra(USER_PASSING_TAG,bundle);
                 startActivity(intent);
+                finish();
 
 //                if(user.getBlood_group()==null)
 //                {
 //                    Intent intent=new Intent(SplashActivity.this,AfterSplashActivity.class);
 //                    intent.putExtra(USER_PASSING_TAG,bundle);
 //                    startActivity(intent);
+//                    finish();
 //                }else
 //                {
 //                    Intent intent=new Intent(SplashActivity.this,MainActivity.class);
-//                    intent.putExtra(USER_PASSING_TAG,bundle);
 //                    startActivity(intent);
+//                    finish();
 //                }
-
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+
+                Log.v("yo",error.getMessage()+"\n"+error.getLocalizedMessage()+"\n"+error.toString());
 
                 dialog.dismiss();
                 NetworkResponse response=error.networkResponse;
@@ -228,7 +234,20 @@ public class SplashActivity extends AppCompatActivity {
                         String res=new String(response.data, HttpHeaderParser.parseCharset(response.headers, "utf-8"));
                         Log.v("yo",res);
                         JSONObject obj=new JSONObject(res);
-                        Log.v("yo",obj.toString());
+                        if(obj.getString("fb_error_type").equals("OAuthException"))
+                        {
+                            AlertDialog.Builder builder=new AlertDialog.Builder(SplashActivity.this);
+                            builder.setTitle("Error");
+                            builder.setMessage("Could not authenticate you. Make sure you gave right username and password for facebook. In case you changed your facebook password, please logout and login again.");
+                            builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });
+                            AlertDialog dialog2=builder.create();
+                            dialog2.show();
+                        }
                     } catch (UnsupportedEncodingException | JSONException e) {
                         e.printStackTrace();
                         Log.v("yo","Again error in Exception");
@@ -284,20 +303,16 @@ public class SplashActivity extends AppCompatActivity {
         video_view.start();
     }
 
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if(dialog.isShowing())
-            dialog.dismiss();
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         call_back_manager.onActivityResult(requestCode,resultCode,data);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     @Override
     protected void onDestroy() {
@@ -309,6 +324,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        MySingleton.getInstance(this).getRequestQueue().cancelAll("login_tag");
+        if(dialog.isShowing())
+            dialog.dismiss();
     }
 }

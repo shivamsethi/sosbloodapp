@@ -1,15 +1,20 @@
 package com.example.sosblood.fragments;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,13 +30,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.sosblood.R;
 import com.example.sosblood.models.User;
+import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
 import com.example.sosblood.others.MySpinner;
@@ -45,12 +50,13 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 
 public class RequestGenerateFragment extends Fragment {
 
@@ -68,11 +74,15 @@ public class RequestGenerateFragment extends Fragment {
     private double latitude,longitude;
     private ProgressBar region_progress_bar;
     private AddressResultReceiver receiver;
+    private ProgressDialog progress_dialog;
+    private boolean can_type_city=false;
+    private SparseArray<String> blood_groups;
 
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE=1;
 
     public interface RequestGenerateToMainListener{
         User getCurrentUser();
+        void restartActivity();
     }
 
     public RequestGenerateFragment() {
@@ -93,6 +103,8 @@ public class RequestGenerateFragment extends Fragment {
 
         receiver=new AddressResultReceiver(new Handler());
 
+        blood_groups=((MyApplication)getActivity().getApplication()).getBloodGroups();
+
         blood_group_spinner=(MySpinner)view.findViewById(R.id.spinner_blood_group_id);
         radio_group=(RadioGroup)view.findViewById(R.id.request_radio_group_id);
         region_edittext=(EditText)view.findViewById(R.id.region_edittext_id);
@@ -108,6 +120,10 @@ public class RequestGenerateFragment extends Fragment {
         rel_lay_button=(RelativeLayout)view.findViewById(R.id.rel_lay_button_id);
         parent_lin_lay=(LinearLayout)view.findViewById(R.id.parent_lin_lay_id);
         region_progress_bar=(ProgressBar)view.findViewById(R.id.region_progress_bar_id);
+        progress_dialog=new ProgressDialog(getActivity());
+        progress_dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progress_dialog.setMessage("Requesting...");
+        progress_dialog.setCancelable(false);
 
         if(listener!=null)
             user=listener.getCurrentUser();
@@ -115,7 +131,12 @@ public class RequestGenerateFragment extends Fragment {
         myself_radio_button.setChecked(true);
         hideViews();
 
-        List<String> blood_groups= Arrays.asList(getResources().getStringArray(R.array.blood_group_entries));
+        List<String> blood_groups=new ArrayList<>();
+        SparseArray<String> bg_array=((MyApplication)getActivity().getApplication()).getBloodGroups();
+        for(int i=0;i<bg_array.size();i++)
+        {
+            blood_groups.add(bg_array.get(i+1));
+        }
         CustomSpinnerAdapter adapter=new CustomSpinnerAdapter(getActivity(),blood_groups,"Select Blood Group");
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         blood_group_spinner.setAdapter(adapter);
@@ -140,12 +161,15 @@ public class RequestGenerateFragment extends Fragment {
         region_edittext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try
+                if(!can_type_city)
                 {
-                    Intent intent=new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).build(getActivity());
-                    startActivityForResult(intent,PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
+                    try
+                    {
+                        Intent intent=new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).build(getActivity());
+                        startActivityForResult(intent,PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                    } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -167,7 +191,7 @@ public class RequestGenerateFragment extends Fragment {
                     case R.id.myself_radio_button_id:
                         if(user!=null)
                         {
-                            generateBloodRequest(user.getAccess_token(),user.getAge(),user.getLatitude(),user.getLongitude(),user.getAddress(),user.getBlood_group(),note_edittext.getText().toString());
+                            generateBloodRequest(Integer.toString(user.getId()),user.getAge(),user.getLatitude(),user.getLongitude(),user.getAddress(),user.getBlood_group(),note_edittext.getText().toString());
                         }
                         break;
 
@@ -225,20 +249,21 @@ public class RequestGenerateFragment extends Fragment {
         layout.setErrorEnabled(false);
     }
 
-    private void generateBloodRequest(String id,int age,double latitude,double longitude,String address,int bgroup,String note)
+    private void generateBloodRequest(String id, int age, double latitude, double longitude, String address, final int bgroup, String note)
     {
+        progress_dialog.show();
+
         String url=MyConstants.BASE_URL_API+"blood_requests/";
         JSONObject blood_req_json=new JSONObject();
         JSONObject json=new JSONObject();
         try
         {
-            blood_req_json.put("id",id);
             blood_req_json.put("age",age);
             blood_req_json.put("latitude",latitude);
             blood_req_json.put("longitude",longitude);
             blood_req_json.put("address",address);
             blood_req_json.put("bgroup",bgroup);
-            blood_req_json.put("request_type",bgroup);
+            blood_req_json.put("request_type",1);
             blood_req_json.put("note",note);
             json.put("blood_request",blood_req_json);
         } catch (JSONException e) {
@@ -247,14 +272,58 @@ public class RequestGenerateFragment extends Fragment {
 
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, url, json, new Response.Listener<JSONObject>() {
             @Override
-            public void onResponse(JSONObject response) {
-                Log.v("yo",response.toString());
+            public void onResponse(JSONObject json_response) {
+                JSONObject response=new JSONObject();
+                View view=getActivity().getLayoutInflater().inflate(R.layout.request_acknowledge,null);
+                TextView bgroup_tv,region_tv,age_tv;
+                Button okay_button=(Button)view.findViewById(R.id.okay_button_id);
+                bgroup_tv=(TextView)view.findViewById(R.id.blood_group_textview_id);
+                region_tv=(TextView)view.findViewById(R.id.region_textview_id);
+                age_tv=(TextView)view.findViewById(R.id.age_textview_id);
+                try
+                {
+                    response=json_response.getJSONObject("blood_request");
+                    bgroup_tv.setText(blood_groups.get(response.getInt("bgroup")));
+                    age_tv.setText(Integer.toString(response.getInt("age")));
+                    region_tv.setText(response.getString("address"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                AlertDialog.Builder builder=new AlertDialog.Builder(getActivity())
+                        .setView(view);
+
+                final AlertDialog dialog=builder.create();
+                progress_dialog.dismiss();
+                dialog.show();
+                okay_button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(dialog.isShowing())
+                            dialog.dismiss();
+
+                        listener.restartActivity();
+                    }
+                });
+
+                SharedPreferences shared_prefs=getActivity().getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
+                SharedPreferences.Editor editor=shared_prefs.edit();
+                editor.putBoolean("request_exists",true);
+                try
+                {
+                    editor.putString("request_id",response.getString("id"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                editor.apply();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.v("yo",error.getMessage()+"\n"+error.getLocalizedMessage()+"\n"+error.toString());
+                if(progress_dialog.isShowing())
+                    progress_dialog.dismiss();
                 error.printStackTrace();
+                Log.v("yo",error.getLocalizedMessage()+"\n"+error.getMessage()+"\n"+error.toString());
             }
         }){
             @Override
@@ -264,27 +333,26 @@ public class RequestGenerateFragment extends Fragment {
                 headers.put("Authorization", user.getAccess_token());
                 return headers;
             }
-
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                Log.v("yo","code is "+response.statusCode);
-                return super.parseNetworkResponse(response);
-            }
         };
 
         MySingleton.getInstance(getActivity()).addToRequestQueue(request,"blood_request");
-        Toast.makeText(getActivity(), "fired", Toast.LENGTH_SHORT).show();
-
     }
 
     private void hideViews() {
+
         blood_group_spinner.setVisibility(View.INVISIBLE);
         region_input_lay.setVisibility(View.INVISIBLE);
         same_region_textview.setVisibility(View.INVISIBLE);
         age_input_lay.setVisibility(View.INVISIBLE);
-        ((ViewGroup)blood_group_spinner.getParent()).removeView(blood_group_spinner);
-        ((ViewGroup)rel_lay_region.getParent()).removeView(rel_lay_region);
-        ((ViewGroup)age_input_lay.getParent()).removeView(age_input_lay);
+        try
+        {
+            ((ViewGroup)blood_group_spinner.getParent()).removeView(blood_group_spinner);
+            ((ViewGroup)rel_lay_region.getParent()).removeView(rel_lay_region);
+            ((ViewGroup)age_input_lay.getParent()).removeView(age_input_lay);
+        }catch (NullPointerException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void showViews()
@@ -347,8 +415,41 @@ public class RequestGenerateFragment extends Fragment {
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             region_progress_bar.setVisibility(View.INVISIBLE);
-            region_edittext.setText(resultData.getString(MyConstants.RESULT_DATA_KEY));
+            if(resultCode==MyConstants.SUCCESS_RESULT)
+                region_edittext.setText(resultData.getString(MyConstants.RESULT_DATA_KEY));
+            else
+            {
+                if(!resultData.getString(MyConstants.RESULT_DATA_KEY).equals(getResources().getString(R.string.invalid_lat_lng)))
+                {
+                    AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Oooops!!");
+                    builder.setMessage("Seems that Location service didn't work as expected. This is a temporary problem, no worries. You can still type city manually. Go on.");
+                    builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    AlertDialog dialog1=builder.create();
+                    dialog1.show();
+                    can_type_city=true;
+                    region_edittext.setFocusableInTouchMode(true);
+                    region_edittext.setFocusable(true);
+                }else
+                {
+                    AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Error");
+                    builder.setMessage("Problem getting location. Please request again. If problem persists, try after an hour. We value your each second.");
+                    builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    AlertDialog dialog1=builder.create();
+                    dialog1.show();
+                }
+            }
         }
     }
-
 }

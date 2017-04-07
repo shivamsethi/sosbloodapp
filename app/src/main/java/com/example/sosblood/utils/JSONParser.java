@@ -1,9 +1,17 @@
 package com.example.sosblood.utils;
 
+import android.content.Context;
+
+import com.example.sosblood.models.NeedyPerson;
 import com.example.sosblood.models.User;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 public class JSONParser {
 
@@ -18,7 +26,10 @@ public class JSONParser {
             user.setPicture_url(object.getString("picture"));
             user.setId(object.getInt("id"));
             user.setAccess_token(object.getString("access_token"));
-            user.setAge(21);
+
+            String bday=object.getString("birthday");
+            int age=getAge(Integer.parseInt(bday.substring(6,10)),Integer.parseInt(bday.substring(0,2)),Integer.parseInt(bday.substring(3,5)));
+            user.setAge(age);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -56,7 +67,53 @@ public class JSONParser {
             e.printStackTrace();
         }
 
-
         return user;
+    }
+
+    private static int getAge(int DOByear, int DOBmonth, int DOBday)
+    {
+        int age;
+        final Calendar calenderToday = Calendar.getInstance();
+        int currentYear = calenderToday.get(Calendar.YEAR);
+        int currentMonth = 1 + calenderToday.get(Calendar.MONTH);
+        int todayDay = calenderToday.get(Calendar.DAY_OF_MONTH);
+
+        age = currentYear - DOByear;
+
+        if(DOBmonth > currentMonth){
+            --age;
+        }
+        else if(DOBmonth == currentMonth){
+            if(DOBday > todayDay){
+                --age;
+            }
+        }
+        return age;
+    }
+
+    public static List<NeedyPerson> fetchNeedyPersons(JSONArray array, Context context) {
+        List<NeedyPerson> needy_persons=new ArrayList<>();
+
+        for(int i=0;i<array.length();i++)
+        {
+            try
+            {
+                NeedyPerson needy_person=new NeedyPerson();
+                JSONObject obj=array.getJSONObject(i);
+                needy_person.setFirst_name(obj.getString("first_name"));
+                needy_person.setNeedy_id(obj.getString("id"));
+                needy_person.setNote(obj.getString("note"));
+                needy_person.setBlood_group(obj.getInt("bgroup"));
+                needy_person.setAddress(obj.getString("address"));
+                needy_person.setAge(obj.getInt("age"));
+                needy_person.setLast_name(obj.getString("last_name"));
+                needy_person.setPicture_url("https://pbs.twimg.com/profile_images/827202538722037761/o0Ge8hUB.jpg");
+
+                needy_persons.add(needy_person);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return needy_persons;
     }
 }

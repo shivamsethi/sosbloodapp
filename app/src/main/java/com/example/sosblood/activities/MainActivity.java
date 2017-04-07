@@ -1,14 +1,20 @@
 package com.example.sosblood.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TabHost;
+import android.widget.Toast;
 
 import com.example.sosblood.R;
 import com.example.sosblood.fragments.DonateFragment;
@@ -19,13 +25,15 @@ import com.example.sosblood.fragments.RequestStatusFragment;
 import com.example.sosblood.models.User;
 import com.example.sosblood.others.DummyTabContent;
 import com.example.sosblood.others.MyConstants;
+import com.facebook.login.LoginManager;
 
-public class MainActivity extends AppCompatActivity implements RequestGenerateFragment.RequestGenerateToMainListener{
+public class MainActivity extends AppCompatActivity implements RequestGenerateFragment.RequestGenerateToMainListener,HomeFragment.HomeToMainListener{
 
     private TabHost tab_host;
     private TabHost.TabSpec tab_spec;
     private User user;
     private boolean request_exists;
+    private MenuItem cancel_request_menu_item;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,99 +100,190 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
             tab_host.getTabWidget().getChildAt(i).setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
         }
 
+        initFrag(0);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.tab_content_container_id,new HomeFragment(),"home").commit();
-
-
-        tab_host.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+        TabHost.OnTabChangeListener tab_change_listener=new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String tag) {
-                String title=null;
+                changeTab(tag);
+            }
+        };
 
-                FragmentManager fm=getSupportFragmentManager();
-                FragmentTransaction transaction=fm.beginTransaction();
+        tab_host.setOnTabChangedListener(tab_change_listener);
+    }
 
-                HomeFragment home_frag=(HomeFragment) fm.findFragmentByTag("home");
-                DonateFragment donate_frag= (DonateFragment) fm.findFragmentByTag("donate");
-                NotificationFragment notification_frag= (NotificationFragment) fm.findFragmentByTag("notification");
+    private void initFrag(int which)
+    {
+        switch(which)
+        {
+            case 0:
+                getSupportFragmentManager().beginTransaction().replace(R.id.tab_content_container_id,new HomeFragment(),"home").commit();
+                break;
 
-                RequestStatusFragment req_status_frag=new RequestStatusFragment();
-                RequestGenerateFragment req_generate_frag=new RequestGenerateFragment();
+            case 2:
+                getSupportFragmentManager().beginTransaction().replace(R.id.tab_content_container_id,new DonateFragment(),"donate").commit();
+                break;
 
+            case 3:
+                getSupportFragmentManager().beginTransaction().replace(R.id.tab_content_container_id,new NotificationFragment(),"notification").commit();
+                break;
+        }
+    }
+
+    private void changeTab(String tag)
+    {
+        String title=null;
+
+        FragmentManager fm=getSupportFragmentManager();
+        FragmentTransaction transaction=fm.beginTransaction();
+
+        HomeFragment home_frag=(HomeFragment) fm.findFragmentByTag("home");
+        DonateFragment donate_frag= (DonateFragment) fm.findFragmentByTag("donate");
+        NotificationFragment notification_frag= (NotificationFragment) fm.findFragmentByTag("notification");
+
+        RequestStatusFragment req_status_frag=new RequestStatusFragment();
+        RequestGenerateFragment req_generate_frag=new RequestGenerateFragment();
+
+        if(request_exists)
+        {
+            req_status_frag=(RequestStatusFragment)fm.findFragmentByTag("request");
+            if(req_status_frag!=null)
+                transaction.detach(req_status_frag);
+        }
+        else
+        {
+            req_generate_frag=(RequestGenerateFragment)fm.findFragmentByTag("request");
+            if(req_generate_frag!=null)
+                transaction.detach(req_generate_frag);
+        }
+
+        if(home_frag!=null)
+            transaction.detach(home_frag);
+
+        if(donate_frag!=null)
+            transaction.detach(donate_frag);
+
+        if(notification_frag!=null)
+            transaction.detach(notification_frag);
+
+        cancel_request_menu_item.setVisible(false);
+        switch(tag)
+        {
+            case "home":
+                title="SOS Blood";
+                if(home_frag==null)
+                    transaction.add(R.id.tab_content_container_id,new HomeFragment(),"home");
+                else
+                    transaction.attach(home_frag);
+                break;
+
+            case "request":
+                title="Request";
                 if(request_exists)
                 {
-                    req_status_frag=(RequestStatusFragment)fm.findFragmentByTag("request");
-                    if(req_status_frag!=null)
-                        transaction.detach(req_status_frag);
+                    cancel_request_menu_item.setVisible(true);
+                    if(req_status_frag==null)
+                        transaction.add(R.id.tab_content_container_id,new RequestStatusFragment(),"request");
+                    else
+                        transaction.attach(req_status_frag);
                 }
                 else
                 {
-                    req_generate_frag=(RequestGenerateFragment)fm.findFragmentByTag("request");
-                    if(req_generate_frag!=null)
-                        transaction.detach(req_generate_frag);
+                    if(req_generate_frag==null)
+                        transaction.add(R.id.tab_content_container_id,new RequestGenerateFragment(),"request");
+                    else
+                        transaction.attach(req_generate_frag);
                 }
+                break;
 
-                if(home_frag!=null)
-                    transaction.detach(home_frag);
+            case "donate":
+                title="Donate";
+                if(donate_frag==null)
+                    transaction.add(R.id.tab_content_container_id,new DonateFragment(),"donate");
+                else
+                    transaction.attach(donate_frag);
+                break;
 
-                if(donate_frag!=null)
-                    transaction.detach(donate_frag);
-
-                if(notification_frag!=null)
-                    transaction.detach(notification_frag);
-
-                switch(tag)
-                {
-                    case "home":
-                        title="SOS Blood";
-                        if(home_frag==null)
-                            transaction.add(R.id.tab_content_container_id,new HomeFragment(),"home");
-                        else
-                            transaction.attach(home_frag);
-                        break;
-
-                    case "request":
-                        title="Request";
-                        if(request_exists)
-                        {
-                            if(req_status_frag==null)
-                                transaction.add(R.id.tab_content_container_id,new RequestStatusFragment(),"request");
-                            else
-                                transaction.attach(req_status_frag);
-                        }
-                        else
-                        {
-                            if(req_generate_frag==null)
-                                transaction.add(R.id.tab_content_container_id,new RequestGenerateFragment(),"request");
-                            else
-                                transaction.attach(req_generate_frag);
-                        }
-                        break;
-
-                    case "donate":
-                        title="Donate";
-                        if(donate_frag==null)
-                            transaction.add(R.id.tab_content_container_id,new DonateFragment(),"donate");
-                        else
-                            transaction.attach(donate_frag);
-                        break;
-
-                    case "notification":
-                        title="Notifications";
-                        if(notification_frag==null)
-                            transaction.add(R.id.tab_content_container_id,new NotificationFragment(),"notification");
-                        else
-                            transaction.attach(notification_frag);
-                        break;
-                }
-                transaction.commit();
-                getSupportActionBar().setTitle(title);
-            }
-        });
+            case "notification":
+                title="Notifications";
+                if(notification_frag==null)
+                    transaction.add(R.id.tab_content_container_id,new NotificationFragment(),"notification");
+                else
+                    transaction.attach(notification_frag);
+                break;
+        }
+        transaction.commit();
+        getSupportActionBar().setTitle(title);
     }
 
     @Override
     public User getCurrentUser() {
         return user;
+    }
+
+    @Override
+    public void restartActivity() {
+        startActivity(getIntent());
+        finish();
+    }
+
+    @Override
+    public User getCurrentUserinHome() {
+        return user;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu,menu);
+
+        cancel_request_menu_item=menu.findItem(R.id.cancel_request_item_id);
+        cancel_request_menu_item.setVisible(false);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId())
+        {
+            case R.id.logout_item_id:
+                LoginManager.getInstance().logOut();
+                startActivity(new Intent(this,SplashActivity.class));
+                finish();
+                return true;
+
+            case R.id.cancel_request_item_id:
+                AlertDialog.Builder builder=new AlertDialog.Builder(this);
+                builder.setTitle("Cancel Request");
+                builder.setMessage("Are you sure you want to cancel your current request?");
+                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        cancelRequest();
+                    }
+                });
+                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+                AlertDialog dialog=builder.create();
+                dialog.show();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void cancelRequest()
+    {
+        SharedPreferences shared_prefs=getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
+        SharedPreferences.Editor editor=shared_prefs.edit();
+        editor.putBoolean("request_exists",false);
+        editor.putString("request_id",null);
+        editor.apply();
+        Toast.makeText(this, "Request cancelled", Toast.LENGTH_SHORT).show();
+        startActivity(getIntent());
+        finish();
     }
 }

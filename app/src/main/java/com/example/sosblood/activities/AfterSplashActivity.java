@@ -1,6 +1,7 @@
 package com.example.sosblood.activities;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
@@ -12,8 +13,10 @@ import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -30,6 +33,7 @@ import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.sosblood.R;
 import com.example.sosblood.models.User;
+import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
 import com.example.sosblood.others.MySpinner;
@@ -54,7 +58,7 @@ import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +77,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
     private LocationRequest location_request;
     private AddressResultReceiver receiver;
     private double latitude,longitude;
+    private boolean can_type_city=false;
 
     private static final int REQUEST_LOCATION_SETTINGS=1;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE=2;
@@ -97,6 +102,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         region_edittext=(EditText)findViewById(R.id.region_edittext_id);
         region_progress_bar=(ProgressBar)findViewById(R.id.region_progress_bar_id);
         dialog=new ProgressDialog(this);
+
         dialog.setMessage("Just a moment...");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
@@ -104,18 +110,25 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         region_edittext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try
+                if(!can_type_city)
                 {
-                    Intent intent=new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).build(AfterSplashActivity.this);
-                    startActivityForResult(intent,PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
+                    try
+                    {
+                        Intent intent=new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_FULLSCREEN).build(AfterSplashActivity.this);
+                        startActivityForResult(intent,PLACE_AUTOCOMPLETE_REQUEST_CODE);
+                    } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
 
-
-        List<String> blood_groups= Arrays.asList(getResources().getStringArray(R.array.blood_group_entries));
+        List<String> blood_groups=new ArrayList<>();
+        SparseArray<String> bg_array=((MyApplication)this.getApplication()).getBloodGroups();
+        for(int i=0;i<bg_array.size();i++)
+        {
+            blood_groups.add(bg_array.get(i+1));
+        }
         CustomSpinnerAdapter adapter=new CustomSpinnerAdapter(this,blood_groups,"Select Blood Group");
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         blood_group_spinner.setAdapter(adapter);
@@ -146,7 +159,6 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         SharedPreferences.Editor editor=shared_prefs.edit();
         editor.putBoolean("request_exists",false);
         editor.apply();
-
     }
 
     private void setupLocation() {
@@ -226,8 +238,14 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     protected void onStop() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(google_api_client,this);
-        google_api_client.disconnect();
+        try
+        {
+            LocationServices.FusedLocationApi.removeLocationUpdates(google_api_client,this);
+            google_api_client.disconnect();
+        }catch(IllegalStateException e)
+        {
+            e.printStackTrace();
+        }
         super.onStop();
     }
 
@@ -275,7 +293,6 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
                 int blood_group=blood_group_spinner.getSelectedItemPosition();
                 String address=region_edittext.getText().toString();
                 hitSecondApi(blood_group,address);
-
             }
             else
             {
@@ -291,7 +308,6 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
 
     private void hitSecondApi(final int blood_group, final String address)
     {
-
         dialog.show();
         String url=MyConstants.BASE_URL_API+"users/"+user.getId();
         JSONObject user_json=new JSONObject();
@@ -306,7 +322,6 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
 
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.PUT, url, json, new Response.Listener<JSONObject>() {
             @Override
@@ -335,12 +350,11 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
                     dialog.dismiss();
                     appendUserLocally(blood_group,address);
                     startActivity(new Intent(AfterSplashActivity.this,MainActivity.class));
+                    finish();
                 }
                 return super.parseNetworkResponse(response);
             }
         };
-
-
         MySingleton.getInstance(this).addToRequestQueue(request,"second_tag");
     }
 
@@ -390,11 +404,44 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
             super(handler);
         }
 
-
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             region_progress_bar.setVisibility(View.INVISIBLE);
-            region_edittext.setText(resultData.getString(MyConstants.RESULT_DATA_KEY));
+            if(resultCode==MyConstants.SUCCESS_RESULT)
+                region_edittext.setText(resultData.getString(MyConstants.RESULT_DATA_KEY));
+            else
+            {
+                if(!resultData.getString(MyConstants.RESULT_DATA_KEY).equals(getResources().getString(R.string.invalid_lat_lng)))
+                {
+                    AlertDialog.Builder builder=new AlertDialog.Builder(AfterSplashActivity.this);
+                    builder.setTitle("Oooops!!");
+                    builder.setMessage("Seems that Location service didn't work as expected. This is a temporary problem, no worries. You can still type your city manually. Go on.");
+                    builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    AlertDialog dialog1=builder.create();
+                    dialog1.show();
+                    can_type_city=true;
+                    region_edittext.setFocusableInTouchMode(true);
+                    region_edittext.setFocusable(true);
+                }else
+                {
+                    AlertDialog.Builder builder=new AlertDialog.Builder(AfterSplashActivity.this);
+                    builder.setTitle("Error");
+                    builder.setMessage("Problem getting location. Please go back and login again. If problem persists, try after an hour. We value your each second.");
+                    builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+                    AlertDialog dialog1=builder.create();
+                    dialog1.show();
+                }
+            }
         }
     }
 }
