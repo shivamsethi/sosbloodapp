@@ -102,7 +102,6 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(JSONObject response) {
 
-                Log.v("yo",response.toString());
                 try
                 {
                     JSONArray array=response.getJSONArray("blood_requests");

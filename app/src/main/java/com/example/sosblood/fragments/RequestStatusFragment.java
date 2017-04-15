@@ -62,7 +62,7 @@ public class RequestStatusFragment extends Fragment {
             populateResponses();
         }else
         {
-            Toast.makeText(getActivity(), "Error while receving responses to your Blood request.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Error while receiving responses to your Blood request.", Toast.LENGTH_SHORT).show();
         }
 
         return view;
@@ -74,7 +74,7 @@ public class RequestStatusFragment extends Fragment {
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.v("yo","my request       "+response.toString());
+
                 try
                 {
                     JSONObject obj=response.getJSONObject("blood_request");
@@ -82,6 +82,7 @@ public class RequestStatusFragment extends Fragment {
                     blood_group=((MyApplication)getActivity().getApplication()).getBloodGroups().get(obj.getInt("bgroup"));
                     address=obj.getString("address");
                     request_info_textview.setText("You requested for blood group "+blood_group+" in "+address);
+                    request_info_progress_bar.setVisibility(View.INVISIBLE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -113,6 +114,7 @@ public class RequestStatusFragment extends Fragment {
             public void onResponse(JSONObject response) {
                 Log.v("yo","responses    "+response.toString());
                 Toast.makeText(getActivity(),response.toString(), Toast.LENGTH_LONG).show();
+                responses_progress_bar.setVisibility(View.INVISIBLE);
             }
         }, new Response.ErrorListener() {
             @Override

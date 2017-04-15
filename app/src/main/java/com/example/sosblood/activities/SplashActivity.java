@@ -238,7 +238,7 @@ public class SplashActivity extends AppCompatActivity {
                         {
                             AlertDialog.Builder builder=new AlertDialog.Builder(SplashActivity.this);
                             builder.setTitle("Error");
-                            builder.setMessage("Could not authenticate you. Make sure you gave right username and password for facebook. In case you changed your facebook password, please logout and login again.");
+                            builder.setMessage("Could not authenticate you. Make sure you gave right username and password for facebook. In case you changed your facebook password or removed SOS Blood from your approved facebook apps, please logout and login again.");
                             builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -278,7 +278,13 @@ public class SplashActivity extends AppCompatActivity {
         editor.putString("picture_url",user.getPicture_url());
         editor.putInt("id",user.getId());
         editor.putString("access_token",user.getAccess_token());
-        editor.putInt("age",user.getAge());
+        try
+        {
+            editor.putInt("age",user.getAge());
+        }catch(NullPointerException e)
+        {
+            e.printStackTrace();
+        }
         if(user.getBlood_group()!=null)
         {
             editor.putInt("blood_group",user.getBlood_group());

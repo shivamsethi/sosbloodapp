@@ -28,8 +28,14 @@ public class JSONParser {
             user.setAccess_token(object.getString("access_token"));
 
             String bday=object.getString("birthday");
-            int age=getAge(Integer.parseInt(bday.substring(6,10)),Integer.parseInt(bday.substring(0,2)),Integer.parseInt(bday.substring(3,5)));
-            user.setAge(age);
+            try
+            {
+                int age=getAge(Integer.parseInt(bday.substring(6,10)),Integer.parseInt(bday.substring(0,2)),Integer.parseInt(bday.substring(3,5)));
+                user.setAge(age);
+            }catch(IndexOutOfBoundsException e)
+            {
+                user.setAge(null);
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -107,7 +113,7 @@ public class JSONParser {
                 needy_person.setAddress(obj.getString("address"));
                 needy_person.setAge(obj.getInt("age"));
                 needy_person.setLast_name(obj.getString("last_name"));
-                needy_person.setPicture_url("https://pbs.twimg.com/profile_images/827202538722037761/o0Ge8hUB.jpg");
+                needy_person.setPicture_url(obj.getString("picture"));
 
                 needy_persons.add(needy_person);
             } catch (JSONException e) {
