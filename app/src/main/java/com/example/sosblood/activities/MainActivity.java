@@ -4,18 +4,33 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.crashlytics.android.Crashlytics;
 import com.example.sosblood.R;
 import com.example.sosblood.fragments.DonateFragment;
 import com.example.sosblood.fragments.HomeFragment;
@@ -25,7 +40,16 @@ import com.example.sosblood.fragments.RequestStatusFragment;
 import com.example.sosblood.models.User;
 import com.example.sosblood.others.DummyTabContent;
 import com.example.sosblood.others.MyConstants;
+import com.example.sosblood.others.MySingleton;
 import com.facebook.login.LoginManager;
+import com.urbanairship.UAirship;
+
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends AppCompatActivity implements RequestGenerateFragment.RequestGenerateToMainListener,HomeFragment.HomeToMainListener{
 
@@ -34,10 +58,14 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
     private User user;
     private boolean request_exists;
     private MenuItem cancel_request_menu_item;
+    private String request_id;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Fabric.with(this,new Crashlytics());
         setContentView(R.layout.activity_main);
 
         Toolbar tool_bar=(Toolbar)findViewById(R.id.main_toolbar_id);
@@ -46,12 +74,25 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
         SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
         request_exists=shared_prefs.getBoolean("request_exists",false);
+        request_id=shared_prefs.getString("request_id",null);
 
         setupTabs();
 
         user=new User();
 
         getUserDataFromSharedPrefs();
+
+        handler=new Handler(Looper.getMainLooper()){
+            @Override
+            public void handleMessage(Message msg) {
+                Toast.makeText(MainActivity.this, "Request cancelled", Toast.LENGTH_SHORT).show();
+                startActivity(getIntent());
+                MainActivity.this.finish();
+            }
+        };
+
+        UAirship.shared().getPushManager().setUserNotificationsEnabled(true);
+
     }
 
     private void getUserDataFromSharedPrefs() {
@@ -76,28 +117,61 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
         tab_spec=tab_host.newTabSpec("home");
         tab_spec.setContent(new DummyTabContent(this));
-        tab_spec.setIndicator("Home",getResources().getDrawable(R.drawable.ic_home_black_36dp));
+        tab_spec.setIndicator("Home",getResources().getDrawable(R.drawable.home_blue));
         tab_host.addTab(tab_spec);
 
         tab_spec=tab_host.newTabSpec("request");
         tab_spec.setContent(new DummyTabContent(this));
-        tab_spec.setIndicator("Request",getResources().getDrawable(R.drawable.request));
+        tab_spec.setIndicator("Request",getResources().getDrawable(R.drawable.request_black));
         tab_host.addTab(tab_spec);
 
         tab_spec=tab_host.newTabSpec("donate");
         tab_spec.setContent(new DummyTabContent(this));
-        tab_spec.setIndicator("Donate",getResources().getDrawable(R.drawable.donate));
+        tab_spec.setIndicator("Donate",getResources().getDrawable(R.drawable.donate_black));
         tab_host.addTab(tab_spec);
 
         tab_spec=tab_host.newTabSpec("notification");
         tab_spec.setContent(new DummyTabContent(this));
-        tab_spec.setIndicator("Notifications",getResources().getDrawable(R.drawable.ic_notifications_black_36dp));
+        tab_spec.setIndicator("Notifications",getResources().getDrawable(R.drawable.notification_black));
         tab_host.addTab(tab_spec);
+
+        double screen_size_case=getScreenSizeCase();
 
         for(int i=0;i<tab_host.getTabWidget().getChildCount();i++)
         {
             tab_host.getTabWidget().getChildAt(i).setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_widget_color));
             tab_host.getTabWidget().getChildAt(i).setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
+            TextView tv = (TextView) tab_host.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
+
+            switch ((int)(screen_size_case*10))
+            {
+                case 40:
+                {
+                    tv.setPadding(0, 0, 0, 7);
+                    tv.setTextSize(12);
+                    break;
+                }
+                case 47:
+                {
+                    tv.setPadding(0, 0, 0, 9);
+                    tv.setTextSize(13);
+                    break;
+                }
+                case 55:
+                {
+                    tv.setPadding(0, 0, 0, 18);
+                    tv.setTextSize(14);
+                    break;
+                }
+                case 60:
+                {
+                    tv.setPadding(0, 0, 0, 25);
+                    tv.setTextSize(15);
+                    break;
+                }
+            }
+
+            tv.setShadowLayer(1, 1, 1, Color.LTGRAY);
         }
 
         initFrag(0);
@@ -110,6 +184,27 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
         };
 
         tab_host.setOnTabChangedListener(tab_change_listener);
+    }
+
+    private double getScreenSizeCase() {
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int width=dm.widthPixels;
+        int height=dm.heightPixels;
+        double wi=(double)width/(double)dm.xdpi;
+        double hi=(double)height/(double)dm.ydpi;
+        double x = Math.pow(wi,2);
+        double y = Math.pow(hi,2);
+        double screenInches = Math.sqrt(x+y);
+
+        double[] sizes=new double[]{4.0,4.7,5.5,6.0};
+        double closest=sizes[0];
+        for(int i=1;i<sizes.length;i++)
+        {
+            if(Math.abs(screenInches-sizes[i])<Math.abs(screenInches-closest))
+                closest=sizes[i];
+        }
+        return closest;
     }
 
     private void initFrag(int which)
@@ -167,9 +262,20 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
             transaction.detach(notification_frag);
 
         cancel_request_menu_item.setVisible(false);
+
+        ImageView home_icon=(ImageView) tab_host.getTabWidget().getChildTabViewAt(0).findViewById(android.R.id.icon);
+        ImageView request_icon=(ImageView) tab_host.getTabWidget().getChildTabViewAt(1).findViewById(android.R.id.icon);
+        ImageView notification_icon=(ImageView) tab_host.getTabWidget().getChildTabViewAt(3).findViewById(android.R.id.icon);
+        ImageView donate_icon=(ImageView) tab_host.getTabWidget().getChildTabViewAt(2).findViewById(android.R.id.icon);
+        home_icon.setImageDrawable(getResources().getDrawable(R.drawable.home_black));
+        request_icon.setImageDrawable(getResources().getDrawable(R.drawable.request_black));
+        donate_icon.setImageDrawable(getResources().getDrawable(R.drawable.donate_black));
+        notification_icon.setImageDrawable(getResources().getDrawable(R.drawable.notification_black));
+
         switch(tag)
         {
             case "home":
+                home_icon.setImageDrawable(getResources().getDrawable(R.drawable.home_blue));
                 title="SOS Blood";
                 if(home_frag==null)
                     transaction.add(R.id.tab_content_container_id,new HomeFragment(),"home");
@@ -178,6 +284,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
                 break;
 
             case "request":
+                request_icon.setImageDrawable(getResources().getDrawable(R.drawable.request_blue));
                 title="Request";
                 if(request_exists)
                 {
@@ -197,6 +304,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
                 break;
 
             case "donate":
+                donate_icon.setImageDrawable(getResources().getDrawable(R.drawable.donate_blue));
                 title="Donate";
                 if(donate_frag==null)
                     transaction.add(R.id.tab_content_container_id,new DonateFragment(),"donate");
@@ -205,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
                 break;
 
             case "notification":
+                notification_icon.setImageDrawable(getResources().getDrawable(R.drawable.notification_blue));
                 title="Notifications";
                 if(notification_frag==null)
                     transaction.add(R.id.tab_content_container_id,new NotificationFragment(),"notification");
@@ -259,7 +368,8 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        cancelRequest();
+                        if(request_id!=null)
+                            cancelRequest();
                     }
                 });
                 builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -277,13 +387,44 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
     private void cancelRequest()
     {
-        SharedPreferences shared_prefs=getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
-        SharedPreferences.Editor editor=shared_prefs.edit();
-        editor.putBoolean("request_exists",false);
-        editor.putString("request_id",null);
-        editor.apply();
-        Toast.makeText(this, "Request cancelled", Toast.LENGTH_SHORT).show();
-        startActivity(getIntent());
-        finish();
+        String url=MyConstants.BASE_URL_API+"blood_requests/"+request_id+"/disable";
+        JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Log.v("yo","yaha"+response.toString());
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                Log.v("yo",error.getLocalizedMessage()+"\n"+error.getMessage()+"\n"+error.toString());
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> headers=new HashMap<>();
+                headers.put("Content-Type","application/json");
+                headers.put("Authorization", user.getAccess_token());
+                return headers;
+            }
+
+            @Override
+            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+
+                if(response.statusCode==204)
+                {
+                    SharedPreferences shared_prefs=getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
+                    SharedPreferences.Editor editor=shared_prefs.edit();
+                    editor.putBoolean("request_exists",false);
+                    editor.putString("request_id",null);
+                    editor.apply();
+                    Message message=handler.obtainMessage();
+                    message.sendToTarget();
+                }
+
+                return super.parseNetworkResponse(response);
+            }
+        };
+        MySingleton.getInstance(this).addToRequestQueue(request,"request");
     }
 }

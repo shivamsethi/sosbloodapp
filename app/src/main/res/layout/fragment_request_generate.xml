@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#ccc">
 
     <LinearLayout
         android:orientation="vertical"
@@ -28,7 +29,8 @@
             android:orientation="vertical"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
-            android:id="@+id/request_radio_group_id">
+            android:id="@+id/request_radio_group_id"
+            android:theme="@style/MyWidgetTheme">
 
             <RadioButton
                 android:layout_width="wrap_content"
@@ -49,7 +51,8 @@
             android:layout_height="45dp"
             android:id="@+id/spinner_blood_group_id"
             android:spinnerMode="dialog"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:theme="@style/MyWidgetTheme"/>
 
         <RelativeLayout
             android:layout_width="wrap_content"
@@ -69,7 +72,7 @@
                     android:focusable="false"
                     android:id="@+id/region_edittext_id"
                     android:inputType="text"
-                    style="@android:style/Widget.EditText"
+                    android:theme="@style/MyWidgetTheme"
                     android:hint=" Region/City" />
 
             </android.support.design.widget.TextInputLayout>
@@ -78,7 +81,7 @@
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:text="@string/same_as_mine"
-                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
                 android:layout_marginTop="8dp"
                 android:textAlignment="center"
                 android:textColor="@color/link_text_color"
@@ -89,8 +92,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/region_progress_bar_id"
-                android:layout_toLeftOf="@+id/same_as_mine_textview_id"
-                android:layout_marginRight="10dp"
+                android:layout_toStartOf="@+id/same_as_mine_textview_id"
+                android:layout_marginEnd="10dp"
                 android:layout_centerVertical="true"
                 android:visibility="gone"
                 style="?android:attr/progressBarStyleSmall"/>
@@ -109,7 +112,7 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/age_edittext_id"
                 android:inputType="number"
-                style="@android:style/Widget.EditText"
+                android:theme="@style/MyWidgetTheme"
                 android:hint=" Age (in years)"/>
 
         </android.support.design.widget.TextInputLayout>

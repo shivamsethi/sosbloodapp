@@ -2,6 +2,7 @@ package com.example.sosblood.utils;
 
 import android.content.Context;
 
+import com.example.sosblood.models.Donor;
 import com.example.sosblood.models.NeedyPerson;
 import com.example.sosblood.models.User;
 
@@ -114,6 +115,7 @@ public class JSONParser {
                 needy_person.setAge(obj.getInt("age"));
                 needy_person.setLast_name(obj.getString("last_name"));
                 needy_person.setPicture_url(obj.getString("picture"));
+                needy_person.setCreation_time(obj.getString("created_at"));
 
                 needy_persons.add(needy_person);
             } catch (JSONException e) {
@@ -121,5 +123,31 @@ public class JSONParser {
             }
         }
         return needy_persons;
+    }
+
+    public static List<Donor> fetchDonors(JSONArray array) {
+        List<Donor> donors=new ArrayList<>();
+
+        for(int i=0;i<array.length();i++)
+        {
+            try
+            {
+                JSONObject obj=array.getJSONObject(i);
+                Donor donor=new Donor();
+
+                donor.setNote(obj.getString("note"));
+                donor.setLast_name(obj.getString("last_name"));
+                donor.setPicture_url(obj.getString("picture"));
+                donor.setFirst_name(obj.getString("first_name"));
+                donor.setPhone(obj.getString("phone"));
+                donor.setId(obj.getString("id"));
+
+                donors.add(donor);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return donors;
     }
 }

@@ -4,9 +4,14 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="android:textColorPrimary">@color/colorPrimary</item>
+        <item name="android:textColorSecondary">@color/white</item>
         <item name="colorControlNormal">@color/white</item>
     </style>
 
+    <style
+        name="MyWidgetTheme">
+        <item name="colorControlNormal">@color/colorPrimary</item>
+    </style>
 
     <style name="TabHostTheme" parent="@style/AppTheme">
         <item name="android:tabWidgetStyle">@style/CustomTabWidget</item>

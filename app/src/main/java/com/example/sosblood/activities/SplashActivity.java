@@ -42,6 +42,7 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.synnapps.carouselview.CarouselView;
 import com.synnapps.carouselview.ViewListener;
+import com.urbanairship.UAirship;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +65,6 @@ public class SplashActivity extends AppCompatActivity {
     private String profile_pic_url;
     private ProgressDialog dialog;
 
-
     String[] carousel_texts={"Find blood donors with our powerful algorithms","Be a donor and do noble work","Can easily connect with facebook account","Take SOS where ever you go"};
 
     @Override
@@ -74,8 +74,8 @@ public class SplashActivity extends AppCompatActivity {
         FacebookSdk.sdkInitialize(getApplicationContext());
         if(AccessToken.getCurrentAccessToken()!=null)
         {
-            /*startActivity(new Intent(this,MainActivity.class));
-            finish();*/
+            startActivity(new Intent(this,MainActivity.class));
+            finish();
         }
 
         setContentView(R.layout.activity_splash);
@@ -172,10 +172,10 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 
-        if(AccessToken.getCurrentAccessToken()!=null)
+        /*if(AccessToken.getCurrentAccessToken()!=null)
         {
             loginToServer();
-        }
+        }*/
     }
 
     private void loginToServer()
@@ -183,6 +183,7 @@ public class SplashActivity extends AppCompatActivity {
         dialog.show();
         Map<String,String> params=new HashMap<>();
         params.put("fb_access_token",AccessToken.getCurrentAccessToken().getToken());
+        params.put("channel_id", UAirship.shared().getPushManager().getChannelId());
 
         final String url= MyConstants.BASE_URL_API+"fbconnect";
 
@@ -193,6 +194,16 @@ public class SplashActivity extends AppCompatActivity {
                 User user= JSONParser.parseFbLogin(response);
 
                 storeUserLocally(user);
+                try
+                {
+                    storeLastRequestInfo(response.getJSONObject("last_blood_request"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
+                    SharedPreferences.Editor editor=shared_prefs.edit();
+                    editor.putBoolean("request_exists",false);
+                    editor.apply();
+                }
 
                 Bundle bundle=new Bundle();
                 bundle.putSerializable(USER_PASSING_TAG,user);
@@ -204,18 +215,18 @@ public class SplashActivity extends AppCompatActivity {
                 startActivity(intent);
                 finish();
 
-//                if(user.getBlood_group()==null)
-//                {
-//                    Intent intent=new Intent(SplashActivity.this,AfterSplashActivity.class);
-//                    intent.putExtra(USER_PASSING_TAG,bundle);
-//                    startActivity(intent);
-//                    finish();
-//                }else
-//                {
-//                    Intent intent=new Intent(SplashActivity.this,MainActivity.class);
-//                    startActivity(intent);
-//                    finish();
-//                }
+                /*if(user.getBlood_group()==null)
+                {
+                    Intent intent=new Intent(SplashActivity.this,AfterSplashActivity.class);
+                    intent.putExtra(USER_PASSING_TAG,bundle);
+                    startActivity(intent);
+                    finish();
+                }else
+                {
+                    Intent intent=new Intent(SplashActivity.this,MainActivity.class);
+                    startActivity(intent);
+                    finish();
+                }*/
 
             }
         }, new Response.ErrorListener() {
@@ -269,7 +280,27 @@ public class SplashActivity extends AppCompatActivity {
         MySingleton.getInstance(SplashActivity.this).addToRequestQueue(fb_login_request,"login_tag");
     }
 
-    private void storeUserLocally(User user) {
+    private void storeLastRequestInfo(JSONObject obj)
+    {
+        try
+        {
+            if(obj!=null && (obj.getBoolean("enabled")||obj.get("enabled")==null))
+            {
+                SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
+                SharedPreferences.Editor editor=shared_prefs.edit();
+                editor.putBoolean("request_exists",true);
+                editor.putString("request_id", obj.getString("id"));
+                editor.putString("request_address", obj.getString("address"));
+                editor.putInt("request_blood_group", obj.getInt("bgroup"));
+                editor.apply();
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void storeUserLocally(User user)
+    {
         SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_USER_KEY, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor=shared_prefs.edit();
         editor.putString("email",user.getEmail());
@@ -303,7 +334,8 @@ public class SplashActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onResume() {
+    protected void onResume()
+    {
         super.onResume();
         video_view.requestFocus();
         video_view.start();

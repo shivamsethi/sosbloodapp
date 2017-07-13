@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,12 +40,14 @@ import java.util.Map;
 
 public class HomeFragment extends Fragment {
 
-    private TextView invite_textview,no_requests_textview;
+    private TextView no_requests_textview;
     private RecyclerView needy_recycler_view;
     private HomeToMainListener listener;
     private User user;
     private ProgressBar recycler_progress_bar;
     private List<NeedyPerson> needy_persons;
+    private ImageView invite_imageview;
+    private SwipeRefreshLayout swipe_refresh_layout;
 
     public interface HomeToMainListener{
         User getCurrentUserinHome();
@@ -63,20 +67,28 @@ public class HomeFragment extends Fragment {
 
         View view=inflater.inflate(R.layout.fragment_home, container, false);
 
-        invite_textview=(TextView)view.findViewById(R.id.invite_textview_id);
         no_requests_textview=(TextView)view.findViewById(R.id.no_requests_textview_id);
         needy_recycler_view=(RecyclerView)view.findViewById(R.id.home_recycler_view_id);
         recycler_progress_bar=(ProgressBar)view.findViewById(R.id.recycler_progress_bar_id);
+        invite_imageview=(ImageView)view.findViewById(R.id.image_view_id);
+        swipe_refresh_layout=(SwipeRefreshLayout)view.findViewById(R.id.swipe_refresh_layout_id);
 
         if(listener!=null)
             user=listener.getCurrentUserinHome();
 
         fetchNearNeedyPeople();
 
-        invite_textview.setOnClickListener(new View.OnClickListener() {
+        invite_imageview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(getActivity(), "Invite friends", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        swipe_refresh_layout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchNearNeedyPeople();
             }
         });
 
@@ -112,6 +124,8 @@ public class HomeFragment extends Fragment {
                         no_requests_textview.setVisibility(View.VISIBLE);
                     else
                         setupRecycler();
+
+                    swipe_refresh_layout.setRefreshing(false);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -153,5 +167,11 @@ public class HomeFragment extends Fragment {
                 startActivity(intent);
             }
         });
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        MySingleton.getInstance(getActivity()).getRequestQueue().cancelAll("home");
     }
 }

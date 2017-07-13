@@ -1,10 +1,12 @@
 package com.example.sosblood.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
@@ -13,6 +15,8 @@ import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -39,6 +43,7 @@ import com.example.sosblood.others.MySingleton;
 import com.example.sosblood.others.MySpinner;
 import com.example.sosblood.utils.CustomSpinnerAdapter;
 import com.example.sosblood.utils.FetchAddressIntentService;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -81,6 +86,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
 
     private static final int REQUEST_LOCATION_SETTINGS=1;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE=2;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE=3;
 
 
     @Override
@@ -89,7 +95,8 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         setContentView(R.layout.activity_after_splash);
 
         receiver=new AddressResultReceiver(new Handler());
-        setupLocation();
+
+        setupLocationPermission();
 
         user=(User)(getIntent().getBundleExtra(SplashActivity.USER_PASSING_TAG).getSerializable(SplashActivity.USER_PASSING_TAG));
 
@@ -154,11 +161,44 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
             }
         });
         MySingleton.getInstance(this).addToRequestQueue(request,"image_tag");
+    }
 
-        SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
-        SharedPreferences.Editor editor=shared_prefs.edit();
-        editor.putBoolean("request_exists",false);
-        editor.apply();
+    private void setupLocationPermission() {
+        int permission= ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION);
+        if(permission== PackageManager.PERMISSION_DENIED)
+        {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            {
+                AlertDialog.Builder builder=new AlertDialog.Builder(AfterSplashActivity.this);
+                builder.setTitle("Alert");
+                builder.setMessage("SOS Blood can automatically detect your location for storing your city information. For this,location permission is required. Kindly click on Allow in the next step.");
+                builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ActivityCompat.requestPermissions(AfterSplashActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_PERMISSION_REQUEST_CODE);
+                    }
+                });
+                AlertDialog dialog=builder.create();
+                dialog.show();
+            }
+            else
+            {
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},LOCATION_PERMISSION_REQUEST_CODE);
+            }
+        }
+        else if(permission==PackageManager.PERMISSION_GRANTED)
+            setupLocation();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode)
+        {
+            case LOCATION_PERMISSION_REQUEST_CODE:
+                setupLocation();
+                break;
+        }
     }
 
     private void setupLocation() {
@@ -200,6 +240,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
             }
         });
 
+        google_api_client.connect();
     }
 
 
@@ -231,7 +272,6 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     protected void onStart() {
-        google_api_client.connect();
         super.onStart();
     }
 
@@ -283,6 +323,13 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
 
     public void actButtonBack(View view) {
         super.onBackPressed();
+        LoginManager.getInstance().logOut();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LoginManager.getInstance().logOut();
     }
 
     public void actButtonNext(View view) {
@@ -389,7 +436,6 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         startIntentService(location);
         LocationServices.FusedLocationApi.removeLocationUpdates(google_api_client,this);
     }
-
 
     @Override
     protected void onPause() {

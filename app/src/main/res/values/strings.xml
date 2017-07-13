@@ -39,4 +39,5 @@
     <string name="invalid_lat_lng">Invalid Lat Lng</string>
     <string name="no_address_found">No addresses found</string>
     <string name="request_details"><u>Request details:</u></string>
+    <string name="accept_text">accepted to donate \nblood to you</string>
 </resources>

@@ -10,65 +10,76 @@
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="80dp"
-        android:orientation="horizontal"
-        android:padding="3dp"
-        android:background="#e8e8e8">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="80dp"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:background="#eee">
 
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="74dp"
-                android:layout_height="74dp"
-                android:src="@drawable/insta"
-                app:civ_border_width="3dp"
-                app:civ_border_color="#ff000000"
-                android:id="@+id/pic_image_view_id"/>
-
-            <ProgressBar
+            <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:id="@+id/progress_bar_id"/>
+                android:layout_height="wrap_content">
 
-        </RelativeLayout>
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:layout_width="74dp"
+                    android:layout_height="74dp"
+                    app:civ_border_width="3dp"
+                    app:civ_border_color="#ff000000"
+                    android:id="@+id/pic_image_view_id"/>
 
-        <RelativeLayout
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:id="@+id/progress_bar_id"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Shivam Sethi"
+                    android:textColor="#000"
+                    android:textSize="19sp"
+                    android:id="@+id/name_textview_id"
+                    android:layout_marginTop="7dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Jhansi, UP"
+                    android:textColor="#444"
+                    android:textSize="15sp"
+                    android:id="@+id/city_textview_id"
+                    android:layout_below="@+id/name_textview_id"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AB+"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:textColor="#cc2333"
+                    android:textSize="17sp"
+                    android:id="@+id/blood_group_textview_id"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <View
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:padding="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Shivam Sethi"
-                android:textColor="#000"
-                android:textSize="19sp"
-                android:id="@+id/name_textview_id"
-                android:layout_marginTop="7dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Jhansi, UP"
-                android:textColor="#444"
-                android:textSize="15sp"
-                android:id="@+id/city_textview_id"
-                android:layout_below="@+id/name_textview_id"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="AB+"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:textColor="#cc2333"
-                android:textSize="17sp"
-                android:id="@+id/blood_group_textview_id"/>
-
-        </RelativeLayout>
+            android:layout_height="3dp"
+            android:background="#ccc"/>
 
     </LinearLayout>
 

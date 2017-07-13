@@ -274,6 +274,7 @@ public class RequestGenerateFragment extends Fragment {
             @Override
             public void onResponse(JSONObject json_response) {
                 JSONObject response=new JSONObject();
+                Log.v("yo",json_response.toString());
                 View view=getActivity().getLayoutInflater().inflate(R.layout.request_acknowledge,null);
                 TextView bgroup_tv,region_tv,age_tv;
                 Button okay_button=(Button)view.findViewById(R.id.okay_button_id);
@@ -312,6 +313,8 @@ public class RequestGenerateFragment extends Fragment {
                 try
                 {
                     editor.putString("request_id",response.getString("id"));
+                    editor.putInt("request_blood_group",response.getInt("bgroup"));
+                    editor.putString("request_address",response.getString("address"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
