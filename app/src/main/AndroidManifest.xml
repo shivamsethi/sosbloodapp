@@ -55,20 +55,31 @@
             android:exported="false" />
 
         <activity android:name=".activities.NeedyDetailActivity" />
-        <activity
-            android:name=".activities.ParseDeepLinkingActivity">
-            <intent-filter>
-                <action
-                    android:name="android.intent.action.VIEW" />
+        <activity android:name=".activities.ParseDeepLinkingActivity">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
                 <data
-                    android:scheme="vnd.urbanairship.sample"
-                    android:host="deeplink" />
-                <category
-                    android:name="android.intent.category.DEFAULT" />
-                <category
-                    android:name="android.intent.category.BROWSABLE" />
+                    android:host="www.sosbloodapp.com"
+                    android:scheme="http" />
+                <data
+                    android:host="www.sosbloodapp.com"
+                    android:scheme="sosbloodapp" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
         </activity>
+
+        <receiver
+            android:name=".receivers.InstallReferrerReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action
+                    android:name="com.android.vending.INSTALL_REFERRER" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
