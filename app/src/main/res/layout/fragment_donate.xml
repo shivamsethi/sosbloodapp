@@ -18,7 +18,7 @@
             android:background="@drawable/filter_lay_bg"
             android:id="@+id/filter_lin_lay_id">
 
-            <TextView
+            <com.example.sosblood.widgets.MyTextView
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"/>
 
-        <com.example.sosblood.others.MySpinner
+        <com.example.sosblood.widgets.MySpinner
             android:layout_width="0dp"
             android:layout_height="45dp"
             android:layout_weight="6"
@@ -60,7 +60,7 @@
         android:background="#555"
         android:layout_marginTop="2dp"/>
 
-    <TextView
+    <com.example.sosblood.widgets.MyTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Pople who need blood"

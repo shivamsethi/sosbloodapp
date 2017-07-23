@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -39,9 +40,9 @@ import com.example.sosblood.models.User;
 import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
-import com.example.sosblood.others.MySpinner;
 import com.example.sosblood.utils.CustomSpinnerAdapter;
 import com.example.sosblood.utils.FetchAddressIntentService;
+import com.example.sosblood.widgets.MySpinner;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -61,12 +62,12 @@ import static android.content.Context.MODE_PRIVATE;
 public class RequestGenerateFragment extends Fragment {
 
     private MySpinner blood_group_spinner;
-    private TextInputLayout region_input_lay,age_input_lay,note_input_lay;
-    private EditText region_edittext,age_edittext,note_edittext;
+    private TextInputLayout region_input_lay,note_input_lay;
+    private EditText region_edittext,note_edittext;
     private TextView same_region_textview;
     private RadioGroup radio_group;
     private Button request_button;
-    private RadioButton myself_radio_button;
+    private RadioButton myself_radio_button,someone_else_radio_button;
     private RequestGenerateToMainListener listener;
     private RelativeLayout rel_lay_region,rel_lay_button;
     private LinearLayout parent_lin_lay;
@@ -77,6 +78,7 @@ public class RequestGenerateFragment extends Fragment {
     private ProgressDialog progress_dialog;
     private boolean can_type_city=false;
     private SparseArray<String> blood_groups;
+    private String address;
 
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE=1;
 
@@ -108,12 +110,11 @@ public class RequestGenerateFragment extends Fragment {
         blood_group_spinner=(MySpinner)view.findViewById(R.id.spinner_blood_group_id);
         radio_group=(RadioGroup)view.findViewById(R.id.request_radio_group_id);
         region_edittext=(EditText)view.findViewById(R.id.region_edittext_id);
-        age_edittext=(EditText)view.findViewById(R.id.age_edittext_id);
         region_input_lay=(TextInputLayout)view.findViewById(R.id.region_input_lay_id);
-        age_input_lay=(TextInputLayout)view.findViewById(R.id.age_input_lay_id);
         same_region_textview=(TextView)view.findViewById(R.id.same_as_mine_textview_id);
         request_button=(Button)view.findViewById(R.id.request_button_id);
         myself_radio_button=(RadioButton)view.findViewById(R.id.myself_radio_button_id);
+        someone_else_radio_button=(RadioButton)view.findViewById(R.id.someone_else_radio_button_id);
         note_input_lay=(TextInputLayout)view.findViewById(R.id.note_input_lay_id);
         note_edittext=(EditText)view.findViewById(R.id.note_edittext_id);
         rel_lay_region=(RelativeLayout)view.findViewById(R.id.rel_lay_region_id);
@@ -124,6 +125,11 @@ public class RequestGenerateFragment extends Fragment {
         progress_dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress_dialog.setMessage("Requesting...");
         progress_dialog.setCancelable(false);
+
+        myself_radio_button.setTypeface(Typeface.createFromAsset(getActivity().getAssets(),"Roboto-Regular.ttf"));
+        someone_else_radio_button.setTypeface(Typeface.createFromAsset(getActivity().getAssets(),"Roboto-Regular.ttf"));
+        note_input_lay.setTypeface(Typeface.createFromAsset(getActivity().getAssets(),"Roboto-Regular.ttf"));
+        region_input_lay.setTypeface(Typeface.createFromAsset(getActivity().getAssets(),"Roboto-Regular.ttf"));
 
         if(listener!=null)
             user=listener.getCurrentUser();
@@ -177,7 +183,7 @@ public class RequestGenerateFragment extends Fragment {
         same_region_textview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                region_edittext.setText(user.getAddress());
+                region_edittext.setText(user.getCity());
                 latitude=user.getLatitude();
                 longitude=user.getLongitude();
             }
@@ -191,35 +197,25 @@ public class RequestGenerateFragment extends Fragment {
                     case R.id.myself_radio_button_id:
                         if(user!=null)
                         {
-                            generateBloodRequest(Integer.toString(user.getId()),user.getAge(),user.getLatitude(),user.getLongitude(),user.getAddress(),user.getBlood_group(),note_edittext.getText().toString());
+                            generateBloodRequest(Integer.toString(user.getId()),user.getLatitude(),user.getLongitude(),user.getAddress(),user.getCity(),user.getBlood_group(),note_edittext.getText().toString());
                         }
                         break;
 
                     case R.id.someone_else_radio_button_id:
                         if(user!=null)
                         {
-                            int age,blood_group;
-                            String address;
+                            int blood_group;
+                            String city;
                             blood_group=blood_group_spinner.getSelectedItemPosition();
-                            address=region_edittext.getText().toString();
+                            city=region_edittext.getText().toString();
                             if(blood_group!=0)
                             {
-                                if(!address.isEmpty())
+                                if(!city.isEmpty())
                                 {
-                                    if(!age_edittext.getText().toString().isEmpty())
-                                    {
-                                        age=Integer.parseInt(age_edittext.getText().toString());
-                                        removeErrorFromInputLayout(age_input_lay);
-                                        removeErrorFromInputLayout(region_input_lay);
-                                        generateBloodRequest(Integer.toString(user.getId()),age,latitude,longitude,address,blood_group,note_edittext.getText().toString());
-                                    }else
-                                    {
-                                        setErrorOnInputLayout(age_input_lay,"Please enter age.");
-                                        removeErrorFromInputLayout(region_input_lay);
-                                    }
+                                    removeErrorFromInputLayout(region_input_lay);
+                                    generateBloodRequest(Integer.toString(user.getId()),latitude,longitude,address,city,blood_group,note_edittext.getText().toString());
                                 }else
                                 {
-                                    removeErrorFromInputLayout(age_input_lay);
                                     setErrorOnInputLayout(region_input_lay,"Please select region.");
                                 }
                             }else
@@ -249,7 +245,7 @@ public class RequestGenerateFragment extends Fragment {
         layout.setErrorEnabled(false);
     }
 
-    private void generateBloodRequest(String id, int age, double latitude, double longitude, String address, final int bgroup, String note)
+    private void generateBloodRequest(String id, double latitude, double longitude, String address,String city, final int bgroup, String note)
     {
         progress_dialog.show();
 
@@ -258,10 +254,10 @@ public class RequestGenerateFragment extends Fragment {
         JSONObject json=new JSONObject();
         try
         {
-            blood_req_json.put("age",age);
             blood_req_json.put("latitude",latitude);
             blood_req_json.put("longitude",longitude);
             blood_req_json.put("address",address);
+            blood_req_json.put("city",city);
             blood_req_json.put("bgroup",bgroup);
             blood_req_json.put("request_type",1);
             blood_req_json.put("note",note);
@@ -269,24 +265,23 @@ public class RequestGenerateFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        Log.v("yo","sending generate req \n"+blood_req_json.toString());
 
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, url, json, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject json_response) {
                 JSONObject response=new JSONObject();
-                Log.v("yo",json_response.toString());
+                Log.v("yo","req generated \n"+json_response.toString());
                 View view=getActivity().getLayoutInflater().inflate(R.layout.request_acknowledge,null);
                 TextView bgroup_tv,region_tv,age_tv;
                 Button okay_button=(Button)view.findViewById(R.id.okay_button_id);
                 bgroup_tv=(TextView)view.findViewById(R.id.blood_group_textview_id);
                 region_tv=(TextView)view.findViewById(R.id.region_textview_id);
-                age_tv=(TextView)view.findViewById(R.id.age_textview_id);
                 try
                 {
                     response=json_response.getJSONObject("blood_request");
                     bgroup_tv.setText(blood_groups.get(response.getInt("bgroup")));
-                    age_tv.setText(Integer.toString(response.getInt("age")));
-                    region_tv.setText(response.getString("address"));
+                    region_tv.setText(response.getString("city"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -314,7 +309,7 @@ public class RequestGenerateFragment extends Fragment {
                 {
                     editor.putString("request_id",response.getString("id"));
                     editor.putInt("request_blood_group",response.getInt("bgroup"));
-                    editor.putString("request_address",response.getString("address"));
+                    editor.putString("request_city",response.getString("city"));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -346,12 +341,10 @@ public class RequestGenerateFragment extends Fragment {
         blood_group_spinner.setVisibility(View.INVISIBLE);
         region_input_lay.setVisibility(View.INVISIBLE);
         same_region_textview.setVisibility(View.INVISIBLE);
-        age_input_lay.setVisibility(View.INVISIBLE);
         try
         {
             ((ViewGroup)blood_group_spinner.getParent()).removeView(blood_group_spinner);
             ((ViewGroup)rel_lay_region.getParent()).removeView(rel_lay_region);
-            ((ViewGroup)age_input_lay.getParent()).removeView(age_input_lay);
         }catch (NullPointerException e)
         {
             e.printStackTrace();
@@ -363,12 +356,10 @@ public class RequestGenerateFragment extends Fragment {
         blood_group_spinner.setVisibility(View.VISIBLE);
         region_input_lay.setVisibility(View.VISIBLE);
         same_region_textview.setVisibility(View.VISIBLE);
-        age_input_lay.setVisibility(View.VISIBLE);
         ((ViewGroup)rel_lay_button.getParent()).removeView(rel_lay_button);
         ((ViewGroup)note_input_lay.getParent()).removeView(note_input_lay);
         parent_lin_lay.addView(blood_group_spinner);
         parent_lin_lay.addView(rel_lay_region);
-        parent_lin_lay.addView(age_input_lay);
         parent_lin_lay.addView(note_input_lay);
         parent_lin_lay.addView(rel_lay_button);
     }
@@ -408,7 +399,6 @@ public class RequestGenerateFragment extends Fragment {
         getActivity().startService(intent);
     }
 
-
     class AddressResultReceiver extends ResultReceiver
     {
         AddressResultReceiver(Handler handler) {
@@ -419,7 +409,10 @@ public class RequestGenerateFragment extends Fragment {
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             region_progress_bar.setVisibility(View.INVISIBLE);
             if(resultCode==MyConstants.SUCCESS_RESULT)
+            {
                 region_edittext.setText(resultData.getString(MyConstants.RESULT_DATA_KEY));
+                address=resultData.getString(MyConstants.ADDRESS_DATA_KEY);
+            }
             else
             {
                 if(!resultData.getString(MyConstants.RESULT_DATA_KEY).equals(getResources().getString(R.string.invalid_lat_lng)))

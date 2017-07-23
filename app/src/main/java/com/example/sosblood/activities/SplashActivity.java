@@ -5,17 +5,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -48,7 +46,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,7 +53,6 @@ public class SplashActivity extends AppCompatActivity {
 
     public static final String USER_PASSING_TAG="fb_user";
 
-    private VideoView video_view;
     private CarouselView carousel_view;
     private LoginButton fb_login_button;
     private CallbackManager call_back_manager;
@@ -80,7 +76,6 @@ public class SplashActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_splash);
 
-        video_view=(VideoView)findViewById(R.id.video_view_id);
         carousel_view=(CarouselView)findViewById(R.id.carousel_view_id);
         fb_login_button=(LoginButton)findViewById(R.id.fb_login_button_id);
         dialog=new ProgressDialog(this);
@@ -88,9 +83,28 @@ public class SplashActivity extends AppCompatActivity {
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
 
+        fb_login_button.setTypeface(Typeface.createFromAsset(getAssets(),"Roboto-Regular.ttf"));
+        fb_login_button.setBackgroundColor(Color.parseColor("#ffffff"));
+        fb_login_button.setBackground(getResources().getDrawable(R.drawable.round_cornered_button));
+
         call_back_manager=CallbackManager.Factory.create();
 
-        fb_login_button.setReadPermissions(Arrays.asList("email","user_birthday"));
+        profile_tracker=new ProfileTracker() {
+            @Override
+            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
+                if(oldProfile!=null && currentProfile==null)
+                {
+                    Toast.makeText(SplashActivity.this,oldProfile.getName()+" logged out.", Toast.LENGTH_SHORT).show();
+                }
+                if(oldProfile==null && currentProfile!=null)
+                {
+                    profile_pic_url=currentProfile.getProfilePictureUri(150,150).toString();
+                }
+            }
+        };
+        profile_tracker.startTracking();
+
+        fb_login_button.setReadPermissions("email");
         fb_login_button.registerCallback(call_back_manager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
@@ -121,42 +135,27 @@ public class SplashActivity extends AppCompatActivity {
         });
 
 
-        profile_tracker=new ProfileTracker() {
-            @Override
-            protected void onCurrentProfileChanged(Profile oldProfile, Profile currentProfile) {
-                if(oldProfile!=null && currentProfile==null)
-                {
-                    Toast.makeText(SplashActivity.this,oldProfile.getName()+" logged out.", Toast.LENGTH_SHORT).show();
-                }
-                if(oldProfile==null && currentProfile!=null)
-                {
-                    profile_pic_url=currentProfile.getProfilePictureUri(150,150).toString();
-                }
-            }
-        };
-        profile_tracker.startTracking();
-
-        final MediaController media_controller=new MediaController(this);
-        media_controller.setAnchorView(video_view);
-        video_view.setMediaController(null);
-
-        Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.blood);
-        video_view.setVideoURI(video);
-
-        video_view.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mediaPlayer.setVolume(0f,0f);
-            }
-        });
-
-
-        video_view.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                video_view.start();
-            }
-        });
+//        final MediaController media_controller=new MediaController(this);
+//        media_controller.setAnchorView(video_view);
+//        video_view.setMediaController(null);
+//
+//        Uri video = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.blood);
+//        video_view.setVideoURI(video);
+//
+//        video_view.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+//            @Override
+//            public void onPrepared(MediaPlayer mediaPlayer) {
+//                mediaPlayer.setVolume(0f,0f);
+//            }
+//        });
+//
+//
+//        video_view.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//            @Override
+//            public void onCompletion(MediaPlayer mediaPlayer) {
+//                video_view.start();
+//            }
+//        });
 
 
         carousel_view.setPageCount(4);
@@ -192,6 +191,7 @@ public class SplashActivity extends AppCompatActivity {
             public void onResponse(JSONObject response) {
 
                 User user= JSONParser.parseFbLogin(response);
+                user.setPicture_url(profile_pic_url);
 
                 storeUserLocally(user);
                 try
@@ -309,13 +309,6 @@ public class SplashActivity extends AppCompatActivity {
         editor.putString("picture_url",user.getPicture_url());
         editor.putInt("id",user.getId());
         editor.putString("access_token",user.getAccess_token());
-        try
-        {
-            editor.putInt("age",user.getAge());
-        }catch(NullPointerException e)
-        {
-            e.printStackTrace();
-        }
         if(user.getBlood_group()!=null)
         {
             editor.putInt("blood_group",user.getBlood_group());
@@ -337,8 +330,8 @@ public class SplashActivity extends AppCompatActivity {
     protected void onResume()
     {
         super.onResume();
-        video_view.requestFocus();
-        video_view.start();
+        //video_view.requestFocus();
+        //video_view.start();
     }
 
     @Override

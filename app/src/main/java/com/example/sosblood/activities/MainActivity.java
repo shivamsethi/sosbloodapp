@@ -1,16 +1,21 @@
 package com.example.sosblood.activities;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,6 +46,7 @@ import com.example.sosblood.models.User;
 import com.example.sosblood.others.DummyTabContent;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
+import com.example.sosblood.utils.CommonTasks;
 import com.facebook.login.LoginManager;
 import com.urbanairship.UAirship;
 
@@ -70,7 +76,8 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
         Toolbar tool_bar=(Toolbar)findViewById(R.id.main_toolbar_id);
         setSupportActionBar(tool_bar);
-        getSupportActionBar().setTitle("SOS Blood");
+        getSupportActionBar().setTitle("SOSBlood");
+        CommonTasks.setToolbarFont(tool_bar,this);
 
         SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
         request_exists=shared_prefs.getBoolean("request_exists",false);
@@ -92,8 +99,66 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
         };
 
         UAirship.shared().getPushManager().setUserNotificationsEnabled(true);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        LocalBroadcastManager locationBroadcastManager = LocalBroadcastManager.getInstance(this);
+
+        // Use local broadcast manager to receive registration events to update the channel
+        IntentFilter channelIdUpdateFilter;
+        channelIdUpdateFilter = new IntentFilter();
+        channelIdUpdateFilter.addAction("ACTION_UPDATE_CHANNEL");
+        locationBroadcastManager.registerReceiver(channelIdUpdateReceiver, channelIdUpdateFilter);
 
     }
+
+    private BroadcastReceiver channelIdUpdateReceiver=new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.v("yo",intent.toString());
+        }
+    };
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        LocalBroadcastManager locationBroadcastManager = LocalBroadcastManager.getInstance(this);
+        locationBroadcastManager.unregisterReceiver(channelIdUpdateReceiver);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private void getUserDataFromSharedPrefs() {
         SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_USER_KEY, Context.MODE_PRIVATE);
@@ -103,11 +168,11 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
         user.setPicture_url(shared_prefs.getString("picture_url","Picture"));
         user.setLatitude(Double.valueOf(shared_prefs.getString("latitude","0.0")));
         user.setAccess_token(shared_prefs.getString("access_token","Access Token"));
+        user.setCity(shared_prefs.getString("city","City"));
         user.setAddress(shared_prefs.getString("address","Address"));
         user.setBlood_group(shared_prefs.getInt("blood_group",0));
         user.setEmail(shared_prefs.getString("email","Email"));
         user.setLast_name(shared_prefs.getString("last_name","Last name"));
-        user.setAge(shared_prefs.getInt("age",21));
     }
 
     private void setupTabs()
@@ -142,6 +207,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
             tab_host.getTabWidget().getChildAt(i).setBackgroundDrawable(getResources().getDrawable(R.drawable.tab_widget_color));
             tab_host.getTabWidget().getChildAt(i).setTextAlignment(View.TEXT_ALIGNMENT_GRAVITY);
             TextView tv = (TextView) tab_host.getTabWidget().getChildAt(i).findViewById(android.R.id.title);
+            tv.setTypeface(Typeface.createFromAsset(getAssets(),"Roboto-Regular.ttf"));
 
             switch ((int)(screen_size_case*10))
             {
@@ -276,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
         {
             case "home":
                 home_icon.setImageDrawable(getResources().getDrawable(R.drawable.home_blue));
-                title="SOS Blood";
+                title="SOSBlood";
                 if(home_frag==null)
                     transaction.add(R.id.tab_content_container_id,new HomeFragment(),"home");
                 else
@@ -285,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
             case "request":
                 request_icon.setImageDrawable(getResources().getDrawable(R.drawable.request_blue));
-                title="Request";
+                title="Request Blood";
                 if(request_exists)
                 {
                     cancel_request_menu_item.setVisible(true);
@@ -305,7 +371,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
             case "donate":
                 donate_icon.setImageDrawable(getResources().getDrawable(R.drawable.donate_blue));
-                title="Donate";
+                title="Donate Blood";
                 if(donate_frag==null)
                     transaction.add(R.id.tab_content_container_id,new DonateFragment(),"donate");
                 else
@@ -314,7 +380,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
             case "notification":
                 notification_icon.setImageDrawable(getResources().getDrawable(R.drawable.notification_blue));
-                title="Notifications";
+                title="Your Notifications";
                 if(notification_frag==null)
                     transaction.add(R.id.tab_content_container_id,new NotificationFragment(),"notification");
                 else
@@ -355,8 +421,26 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId())
         {
+            case R.id.webview_item_id:
+                Intent intent1=new Intent(this,WebViewActivity.class);
+                intent1.putExtra("url","https://www.google.com");
+                startActivity(intent1);
+                return true;
+
+            case R.id.feedback_item_id:
+                String[] to={"shivamsethi2201@gmail.com"};
+                Intent intent = new Intent(Intent.ACTION_SENDTO);
+                intent.setData(Uri.parse("mailto:"));
+                intent.putExtra(Intent.EXTRA_EMAIL, to);
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Feedback for SOS BLOOD version 1");
+                if (intent.resolveActivity(getPackageManager()) != null) {
+                    startActivity(intent);
+                }
+                return true;
+
             case R.id.logout_item_id:
                 LoginManager.getInstance().logOut();
+                removeAllSharedPrefs();
                 startActivity(new Intent(this,SplashActivity.class));
                 finish();
                 return true;
@@ -383,6 +467,13 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void removeAllSharedPrefs() {
+        SharedPreferences shared_prefs=getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
+        shared_prefs.edit().clear().apply();
+        shared_prefs=getSharedPreferences(MyConstants.SHARED_PREFS_USER_KEY,MODE_PRIVATE);
+        shared_prefs.edit().clear().apply();
     }
 
     private void cancelRequest()

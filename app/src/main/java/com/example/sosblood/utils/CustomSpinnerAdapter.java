@@ -9,16 +9,19 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.sosblood.R;
+import com.example.sosblood.widgets.MyTextView;
 
 import java.util.List;
 
 public class CustomSpinnerAdapter extends ArrayAdapter<String> {
 
     private String closed_text;
+    private Context context;
 
     public CustomSpinnerAdapter(Context context, List<String> items, String closed_text) {
         super(context, android.R.layout.simple_spinner_dropdown_item, items);
         this.closed_text=closed_text;
+        this.context=context;
     }
 
 
@@ -48,7 +51,7 @@ public class CustomSpinnerAdapter extends ArrayAdapter<String> {
     private View initialSelection(boolean dropdown) {
         // Just an example using a simple TextView. Create whatever default view
         // to suit your needs, inflating a separate layout if it's cleaner.
-        TextView view = new TextView(getContext());
+        MyTextView view = new MyTextView(getContext());
         view.setText(closed_text);
         int spacing = getContext().getResources().getDimensionPixelSize(R.dimen.spacing_smaller);
         view.setPadding(0, spacing, 0, spacing);

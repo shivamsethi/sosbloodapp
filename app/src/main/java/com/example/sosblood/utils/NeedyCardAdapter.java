@@ -3,6 +3,7 @@ package com.example.sosblood.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -37,7 +39,7 @@ public class NeedyCardAdapter extends RecyclerView.Adapter<NeedyCardAdapter.View
 
     public interface NeedyToHomeListener
     {
-        public void onClick(int position);
+        void onClick(int position);
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder
@@ -63,7 +65,7 @@ public class NeedyCardAdapter extends RecyclerView.Adapter<NeedyCardAdapter.View
     @Override
     public void onBindViewHolder(NeedyCardAdapter.ViewHolder holder, final int position) {
         NeedyPerson needy_person=needy_persons.get(position);
-        CardView card=holder.card_view;
+        final CardView card=holder.card_view;
         final ImageView pic;
         TextView name,city,blood_group;
         final ProgressBar progress_bar;
@@ -87,8 +89,22 @@ public class NeedyCardAdapter extends RecyclerView.Adapter<NeedyCardAdapter.View
         });
         MySingleton.getInstance(context).addToRequestQueue(request,"home");
 
+        pic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try
+                {
+                    CommonTasks.showImageDialog((Activity)context,((BitmapDrawable)(pic.getDrawable())).getBitmap());
+                }catch(NullPointerException e)
+                {
+                    e.printStackTrace();
+                    Toast.makeText(context, "Image not available", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         name.setText(needy_person.getFirst_name()+" "+needy_person.getLast_name());
-        city.setText(needy_person.getAddress());
+        city.setText(needy_person.getCity());
         blood_group.setText(((MyApplication)activity.getApplication()).getBloodGroups().get(needy_person.getBlood_group()));
 
         card.setOnClickListener(new View.OnClickListener() {

@@ -14,7 +14,7 @@
         android:animateLayoutChanges="true"
         android:id="@+id/parent_lin_lay_id">
 
-        <TextView
+        <com.example.sosblood.widgets.MyTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="I need blood for"
@@ -46,7 +46,7 @@
 
         </RadioGroup>
 
-        <com.example.sosblood.others.MySpinner
+        <com.example.sosblood.widgets.MySpinner
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:id="@+id/spinner_blood_group_id"
@@ -77,7 +77,7 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <TextView
+            <com.example.sosblood.widgets.MyTextView
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:text="@string/same_as_mine"
@@ -103,23 +103,6 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/age_input_lay_id"
-            app:errorEnabled="true"
-            android:focusableInTouchMode="true">
-
-            <android.support.design.widget.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/age_edittext_id"
-                android:inputType="number"
-                android:theme="@style/MyWidgetTheme"
-                android:hint=" Age (in years)"/>
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:id="@+id/note_input_lay_id"
             android:focusableInTouchMode="true">
 
@@ -139,7 +122,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/rel_lay_button_id">
 
-            <Button
+            <com.example.sosblood.widgets.MyButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Request"

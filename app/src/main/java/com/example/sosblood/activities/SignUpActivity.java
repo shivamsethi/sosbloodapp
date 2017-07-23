@@ -22,8 +22,9 @@ import android.widget.Toast;
 
 import com.example.sosblood.R;
 import com.example.sosblood.others.MyApplication;
-import com.example.sosblood.others.MySpinner;
+import com.example.sosblood.utils.CommonTasks;
 import com.example.sosblood.utils.CustomSpinnerAdapter;
+import com.example.sosblood.widgets.MySpinner;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -62,8 +63,10 @@ public class SignUpActivity extends AppCompatActivity implements GoogleApiClient
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
 
-        setSupportActionBar((Toolbar)findViewById(R.id.signup_toolbar_id));
+        Toolbar toolbar=(Toolbar)findViewById(R.id.signup_toolbar_id);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("SOS Blood");
+        CommonTasks.setToolbarFont(toolbar,this);
 
         blood_group_spinner=(MySpinner) findViewById(R.id.spinner_blood_group_id);
         image_view=(ImageView)findViewById(R.id.image_view_id);

@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -110,10 +111,9 @@ public class HomeFragment extends Fragment {
             e.printStackTrace();
         }
 
-        JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, url,json, new Response.Listener<JSONObject>() {
+        final JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, url,json, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-
                 try
                 {
                     JSONArray array=response.getJSONArray("blood_requests");
@@ -145,6 +145,8 @@ public class HomeFragment extends Fragment {
                 return headers;
             }
         };
+        request.setRetryPolicy(new DefaultRetryPolicy(20000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
 
         MySingleton.getInstance(getActivity()).addToRequestQueue(request,"home");
     }
@@ -160,8 +162,8 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(int position) {
                 Bundle bundle=new Bundle();
-                bundle.putSerializable("needy_person",needy_persons.get(position));
-                bundle.putSerializable("user",user);
+                bundle.putString("request_id",needy_persons.get(position).getNeedy_id());
+                bundle.putString("access_token",user.getAccess_token());
                 Intent intent=new Intent(getActivity(), NeedyDetailActivity.class);
                 intent.putExtra("needy_person",bundle);
                 startActivity(intent);

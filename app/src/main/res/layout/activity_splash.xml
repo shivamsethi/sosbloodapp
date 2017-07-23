@@ -5,16 +5,17 @@
     android:id="@+id/activity_splash"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.sosblood.activities.SplashActivity">
+    tools:context="com.example.sosblood.activities.SplashActivity"
+    android:background="@drawable/backgound">
 
-    <VideoView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentTop="true"
-        android:id="@+id/video_view_id"/>
+    <!--<VideoView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_alignParentEnd="true"-->
+        <!--android:layout_alignParentBottom="true"-->
+        <!--android:layout_alignParentTop="true"-->
+        <!--android:id="@+id/video_view_id"/>-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,20 +23,18 @@
         android:orientation="vertical"
         android:padding="10dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="SOS BLOOD"
-            android:textColor="#000"
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/logo"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:textSize="27sp"/>
+            android:layout_marginTop="10dp"/>
 
         <com.synnapps.carouselview.CarouselView
             android:layout_width="wrap_content"
             android:layout_height="110dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="80dp"
+            android:layout_marginTop="30dp"
             android:id="@+id/carousel_view_id"
             app:fillColor="#000000"
             app:pageColor="#ffffff"
@@ -54,8 +53,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/fb_login_button_id"
-                android:textSize="17sp"
-                android:textAlignment="center" />
+                android:textSize="23sp"
+                android:textAlignment="center"
+                android:textColor="#D8261A"
+                android:background="@drawable/round_cornered_button"/>
 
         </RelativeLayout>
 

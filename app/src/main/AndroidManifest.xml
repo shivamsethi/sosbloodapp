@@ -76,10 +76,28 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action
-                    android:name="com.android.vending.INSTALL_REFERRER" />
+                <action android:name="com.android.vending.INSTALL_REFERRER" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".activities.DonorDetailActivity" />
+
+        <receiver
+            android:name=".receivers.CustomAirshipReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.urbanairship.push.CHANNEL_UPDATED" />
+                <action android:name="com.urbanairship.push.OPENED" />
+                <action android:name="com.urbanairship.push.RECEIVED" />
+                <action android:name="com.urbanairship.push.DISMISSED" />
+
+                <category android:name="${applicationId}" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".activities.WebViewActivity"
+            android:parentActivityName=".activities.MainActivity"/>
     </application>
 
 </manifest>

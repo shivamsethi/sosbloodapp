@@ -12,7 +12,7 @@
         android:background="@color/theme_red"
         android:id="@+id/signup_toolbar_id"/>
 
-    <TextView
+    <com.example.sosblood.widgets.MyTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sign up to SOS Blood"
@@ -110,7 +110,7 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <com.example.sosblood.others.MySpinner
+            <com.example.sosblood.widgets.MySpinner
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_blood_group_id"
@@ -138,7 +138,7 @@
 
                 </android.support.design.widget.TextInputLayout>
 
-                <TextView
+                <com.example.sosblood.widgets.MyTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/auto_detect"
@@ -149,7 +149,7 @@
                     android:clickable="true"
                     android:id="@+id/same_as_mine_textview_id"/>
 
-                <TextView
+                <com.example.sosblood.widgets.MyTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Or"
@@ -170,7 +170,7 @@
 
             </RelativeLayout>
 
-            <TextView
+            <com.example.sosblood.widgets.MyTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/choose_loc"
@@ -199,7 +199,7 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <TextView
+            <com.example.sosblood.widgets.MyTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="By clicking Sign Up, you agree to our"
@@ -208,7 +208,7 @@
                 android:textSize="15sp"
                 android:textColor="#000"/>
 
-            <TextView
+            <com.example.sosblood.widgets.MyTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/terms_of_service"

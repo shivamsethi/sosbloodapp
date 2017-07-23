@@ -10,18 +10,10 @@ public class User implements Serializable{
     private String email;
     private Integer blood_group;
     private String address;
+    private String city;
     private Double latitude,longitude;
     private String access_token;
-    private Integer age;
     private int id;
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
 
     public Double getLatitude() {
         return latitude;
@@ -102,5 +94,13 @@ public class User implements Serializable{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 }

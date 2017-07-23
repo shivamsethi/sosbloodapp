@@ -27,6 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.sosblood.R;
+import com.example.sosblood.activities.DonorDetailActivity;
 import com.example.sosblood.models.Donor;
 import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MyConstants;
@@ -83,17 +84,8 @@ public class RequestStatusFragment extends Fragment {
         return view;
     }
 
-    private void populateRequestInfo() {
-
-        SharedPreferences shared_prefs=getActivity().getSharedPreferences(MyConstants.SHARED_PREFS_EXTRA_KEY,MODE_PRIVATE);
-        String request_id=shared_prefs.getString("request_id",null);
-        String address=shared_prefs.getString("request_address",null);
-        Integer bg=shared_prefs.getInt("request_blood_group",-1);
-        Log.v("yo",bg+"");
-        String blood_group=((MyApplication)getActivity().getApplication()).getBloodGroups().get(bg);
-        request_info_textview.setText("You requested for blood group "+blood_group+" in "+address);
-        request_info_progress_bar.setVisibility(View.INVISIBLE);
-
+    private void populateRequestInfo()
+    {
         String url=MyConstants.BASE_URL_API+"blood_requests/"+request_id;
 
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -103,10 +95,10 @@ public class RequestStatusFragment extends Fragment {
                 try
                 {
                     JSONObject obj=response.getJSONObject("blood_request");
-                    String blood_group,address;
+                    String blood_group,city;
                     blood_group=((MyApplication)getActivity().getApplication()).getBloodGroups().get(obj.getInt("bgroup"));
-                    address=obj.getString("address");
-                    request_info_textview.setText("You requested for blood group "+blood_group+" in "+address);
+                    city=obj.getString("city");
+                    request_info_textview.setText("You requested for blood group "+blood_group+" in "+city);
                     request_info_progress_bar.setVisibility(View.INVISIBLE);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -127,7 +119,7 @@ public class RequestStatusFragment extends Fragment {
                 return headers;
             }
         };
-        //MySingleton.getInstance(getActivity()).addToRequestQueue(request,"response");
+        MySingleton.getInstance(getActivity()).addToRequestQueue(request,"response");
     }
 
     private void populateResponses() {
@@ -137,7 +129,6 @@ public class RequestStatusFragment extends Fragment {
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                Log.v("yo","responses    "+response.toString());
 
                 try
                 {
@@ -181,9 +172,18 @@ public class RequestStatusFragment extends Fragment {
         adapter.setListener(new DonorCardAdapter.DonorToHomeListener() {
             @Override
             public void onClick(int position) {
-                buildDonorDetailDialog(position);
+                openDonorDetailsActivity(position);
             }
         });
+    }
+
+    private void openDonorDetailsActivity(int position) {
+        Bundle bundle=new Bundle();
+        bundle.putString("donor_id",donors.get(position).getId());
+        bundle.putString("access_token",access_token);
+        Intent intent=new Intent(getActivity(), DonorDetailActivity.class);
+        intent.putExtra("donor",bundle);
+        startActivity(intent);
     }
 
     private void buildDonorDetailDialog(final int position) {

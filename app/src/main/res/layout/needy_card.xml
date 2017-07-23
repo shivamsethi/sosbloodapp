@@ -18,7 +18,7 @@
             android:layout_height="80dp"
             android:orientation="horizontal"
             android:padding="3dp"
-            android:background="#eee">
+            android:background="#fff">
 
             <RelativeLayout
                 android:layout_width="wrap_content"
@@ -29,7 +29,8 @@
                     android:layout_height="74dp"
                     app:civ_border_width="3dp"
                     app:civ_border_color="#ff000000"
-                    android:id="@+id/pic_image_view_id"/>
+                    android:id="@+id/pic_image_view_id"
+                    android:clickable="true"/>
 
                 <ProgressBar
                     android:layout_width="wrap_content"
@@ -41,19 +42,22 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:padding="10dp">
+                android:layout_height="80dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp"
+                android:paddingTop="2dp">
 
-                <TextView
+                <com.example.sosblood.widgets.MyTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Shivam Sethi"
                     android:textColor="#000"
-                    android:textSize="19sp"
+                    android:textSize="18sp"
                     android:id="@+id/name_textview_id"
                     android:layout_marginTop="7dp"/>
 
-                <TextView
+                <com.example.sosblood.widgets.MyTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Jhansi, UP"
@@ -62,7 +66,7 @@
                     android:id="@+id/city_textview_id"
                     android:layout_below="@+id/name_textview_id"/>
 
-                <TextView
+                <com.example.sosblood.widgets.MyTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="AB+"
@@ -70,7 +74,8 @@
                     android:layout_centerVertical="true"
                     android:textColor="#cc2333"
                     android:textSize="17sp"
-                    android:id="@+id/blood_group_textview_id"/>
+                    android:id="@+id/blood_group_textview_id"
+                    android:textStyle="bold"/>
 
             </RelativeLayout>
 

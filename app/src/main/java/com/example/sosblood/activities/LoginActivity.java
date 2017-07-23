@@ -13,6 +13,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.example.sosblood.R;
+import com.example.sosblood.utils.CommonTasks;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,8 +26,10 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        setSupportActionBar((Toolbar)findViewById(R.id.login_toolbar_id));
+        Toolbar toolbar=(Toolbar)findViewById(R.id.login_toolbar_id);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("SOS Blood");
+        CommonTasks.setToolbarFont(toolbar,this);
 
         phone_input_lay=(TextInputLayout)findViewById(R.id.phone_input_lay_id);
         password_input_lay=(TextInputLayout)findViewById(R.id.password_input_lay_id);

@@ -1,10 +1,9 @@
-package com.example.sosblood.others;
+package com.example.sosblood.widgets;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Spinner;
 
-public class MySpinner extends Spinner {
+public class MySpinner extends android.support.v7.widget.AppCompatSpinner {
     public MySpinner(Context context) {
         super(context);
     }

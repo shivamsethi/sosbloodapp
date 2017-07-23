@@ -13,8 +13,8 @@ import android.widget.Toast;
 
 import com.example.sosblood.R;
 import com.example.sosblood.activities.DonateFilterActivity;
-import com.example.sosblood.others.MySpinner;
 import com.example.sosblood.utils.CustomSpinnerAdapter;
+import com.example.sosblood.widgets.MySpinner;
 
 import java.util.Arrays;
 import java.util.List;

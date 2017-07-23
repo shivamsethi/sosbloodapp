@@ -28,16 +28,6 @@ public class JSONParser {
             user.setId(object.getInt("id"));
             user.setAccess_token(object.getString("access_token"));
 
-            String bday=object.getString("birthday");
-            try
-            {
-                int age=getAge(Integer.parseInt(bday.substring(6,10)),Integer.parseInt(bday.substring(0,2)),Integer.parseInt(bday.substring(3,5)));
-                user.setAge(age);
-            }catch(IndexOutOfBoundsException e)
-            {
-                user.setAge(null);
-            }
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -112,7 +102,7 @@ public class JSONParser {
                 needy_person.setNote(obj.getString("note"));
                 needy_person.setBlood_group(obj.getInt("bgroup"));
                 needy_person.setAddress(obj.getString("address"));
-                needy_person.setAge(obj.getInt("age"));
+                needy_person.setCity(obj.getString("city"));
                 needy_person.setLast_name(obj.getString("last_name"));
                 needy_person.setPicture_url(obj.getString("picture"));
                 needy_person.setCreation_time(obj.getString("created_at"));
@@ -123,6 +113,123 @@ public class JSONParser {
             }
         }
         return needy_persons;
+    }
+
+    public static NeedyPerson fetchNeedyPerson(JSONObject obj){
+        NeedyPerson needy_person=new NeedyPerson();
+
+        try{
+            needy_person.setCity(obj.getString("city"));
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setAddress(obj.getString("address"));
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setBlood_group(obj.getInt("bgroup"));
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setNote(obj.getString("note"));
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setNeedy_id(obj.getString("id"));
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setFirst_name(obj.getString("first_name"));
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setCreation_time(obj.getString("created_at"));
+        }catch(JSONException e)
+        {
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setLast_name(obj.getString("last_name"));
+        }catch(JSONException e) {
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setPicture_url(obj.getString("picture"));
+        }catch(JSONException e) {
+            e.printStackTrace();
+        }
+
+        return needy_person;
+    }
+
+    public static Donor fetchDonor(JSONObject obj)
+    {
+        Donor donor=new Donor();
+
+        try
+        {
+            donor.setNote(obj.getString("note"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            donor.setLast_name(obj.getString("last_name"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            donor.setPicture_url(obj.getString("picture"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            donor.setFirst_name(obj.getString("first_name"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            donor.setPhone(obj.getString("phone"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            donor.setId(obj.getString("id"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            donor.setResponse_creation_time(obj.getString("created_at"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return donor;
     }
 
     public static List<Donor> fetchDonors(JSONArray array) {
@@ -141,6 +248,7 @@ public class JSONParser {
                 donor.setFirst_name(obj.getString("first_name"));
                 donor.setPhone(obj.getString("phone"));
                 donor.setId(obj.getString("id"));
+                donor.setResponse_creation_time(obj.getString("created_at"));
 
                 donors.add(donor);
             } catch (JSONException e) {

@@ -19,4 +19,6 @@
     <color name="black_overlay">#66000000</color>
     <color name="light_red">#d6afaf</color>
     <color name="light_green">#8fc992</color>
+    <color name="dial_icon_pressed">#999</color>
+    <color name="dial_icon">#fff</color>
 </resources>

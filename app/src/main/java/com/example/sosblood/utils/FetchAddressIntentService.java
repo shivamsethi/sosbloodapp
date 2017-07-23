@@ -23,7 +23,6 @@ public class FetchAddressIntentService extends IntentService {
         super("FetchAddressIntentService");
     }
 
-
     @Override
     protected void onHandleIntent(Intent intent) {
         Geocoder geocoder=new Geocoder(this, Locale.getDefault());
@@ -50,7 +49,7 @@ public class FetchAddressIntentService extends IntentService {
             {
                 error_msg=getString(R.string.no_address_found);
             }
-            deliverResultToReceiver(MyConstants.FAILURE_RESULT,error_msg);
+            deliverResultToReceiver(MyConstants.FAILURE_RESULT,error_msg,"");
         }
         else
         {
@@ -71,13 +70,14 @@ public class FetchAddressIntentService extends IntentService {
                 builder.append(address.getCountryName());
             }
 
-            deliverResultToReceiver(MyConstants.SUCCESS_RESULT,builder.toString());
+            deliverResultToReceiver(MyConstants.SUCCESS_RESULT,builder.toString(),address.getAddressLine(0));
         }
     }
 
-    private void deliverResultToReceiver(int result_code, String message) {
+    private void deliverResultToReceiver(int result_code, String result_data,String address) {
         Bundle bundle = new Bundle();
-        bundle.putString(MyConstants.RESULT_DATA_KEY, message);
+        bundle.putString(MyConstants.RESULT_DATA_KEY, result_data);
+        bundle.putString(MyConstants.ADDRESS_DATA_KEY, address);
         receiver.send(result_code, bundle);
     }
 }

@@ -25,7 +25,7 @@
 
     </RelativeLayout>
 
-    <TextView
+    <com.example.sosblood.widgets.MyTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#000"
@@ -35,14 +35,6 @@
         android:textSize="21sp"
         android:id="@+id/name_textview_id"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:layout_gravity="center_horizontal"
-        android:id="@+id/email_textview_id"
-        android:textSize="15sp"/>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -50,7 +42,7 @@
         android:layout_marginTop="45dp"
         android:padding="5dp">
 
-        <com.example.sosblood.others.MySpinner
+        <com.example.sosblood.widgets.MySpinner
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/spinner_blood_group_id"
@@ -106,7 +98,7 @@
             style="?android:attr/buttonBarStyle"
             android:orientation="horizontal">
 
-            <Button
+            <com.example.sosblood.widgets.MyButton
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/bottom_bar_bg"
@@ -123,7 +115,7 @@
                 android:background="@color/white"
                 android:layout_gravity="center_vertical"/>
 
-            <Button
+            <com.example.sosblood.widgets.MyButton
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:background="@drawable/bottom_bar_bg"

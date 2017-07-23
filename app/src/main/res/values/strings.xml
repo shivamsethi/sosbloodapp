@@ -24,6 +24,7 @@
 
     <string name="help_text_one">If you want to donate blood to</string>
     <string name="help_text_two">by yourself or through your family member, click on Accept. And if you have no donors, you can share this request with your friends.</string>
+    <string name="help_text_three">has accepted your blood request. You can call to fix up the meeting place and time for the blood donation.</string>
 
     <string-array name="sorting_donor_entries">
 

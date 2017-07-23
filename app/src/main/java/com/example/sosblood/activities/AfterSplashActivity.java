@@ -8,6 +8,7 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,9 +41,9 @@ import com.example.sosblood.models.User;
 import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
-import com.example.sosblood.others.MySpinner;
 import com.example.sosblood.utils.CustomSpinnerAdapter;
 import com.example.sosblood.utils.FetchAddressIntentService;
+import com.example.sosblood.widgets.MySpinner;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -72,7 +73,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
 
     private ProgressDialog dialog;
     private ImageView image_view;
-    private TextView name_textview,email_textview;
+    private TextView name_textview;
     private MySpinner blood_group_spinner;
     private TextInputLayout region_input_lay;
     private EditText region_edittext;
@@ -82,12 +83,12 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
     private LocationRequest location_request;
     private AddressResultReceiver receiver;
     private double latitude,longitude;
-    private boolean can_type_city=false;
+    private boolean can_type_city=false,location_bg_sent=false;
+    private String address;
 
     private static final int REQUEST_LOCATION_SETTINGS=1;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE=2;
     private static final int LOCATION_PERMISSION_REQUEST_CODE=3;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,12 +104,13 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         image_view=(ImageView)findViewById(R.id.dp_image_view_id);
         dp_progress_bar=(ProgressBar)findViewById(R.id.dp_progress_bar_id);
         name_textview=(TextView)findViewById(R.id.name_textview_id);
-        email_textview=(TextView)findViewById(R.id.email_textview_id);
         blood_group_spinner=(MySpinner)findViewById(R.id.spinner_blood_group_id);
         region_input_lay=(TextInputLayout)findViewById(R.id.region_input_lay_id);
         region_edittext=(EditText)findViewById(R.id.region_edittext_id);
         region_progress_bar=(ProgressBar)findViewById(R.id.region_progress_bar_id);
         dialog=new ProgressDialog(this);
+
+        region_input_lay.setTypeface(Typeface.createFromAsset(getAssets(),"Roboto-Regular.ttf"));
 
         dialog.setMessage("Just a moment...");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -142,7 +144,6 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         blood_group_spinner.setPrompt("Select blood group");
 
         name_textview.setText(user.getFirst_name()+" "+user.getLast_name());
-        email_textview.setText(user.getEmail());
 
         ImageRequest request=new ImageRequest(user.getPicture_url(), new Response.Listener<Bitmap>() {
             @Override
@@ -277,7 +278,14 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
 
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     protected void onStop() {
+        if(!location_bg_sent)
+            LoginManager.getInstance().logOut();
         try
         {
             LocationServices.FusedLocationApi.removeLocationUpdates(google_api_client,this);
@@ -338,8 +346,8 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
             if(!region_edittext.getText().toString().isEmpty())
             {
                 int blood_group=blood_group_spinner.getSelectedItemPosition();
-                String address=region_edittext.getText().toString();
-                hitSecondApi(blood_group,address);
+                String city=region_edittext.getText().toString();
+                hitSecondApi(blood_group,city);
             }
             else
             {
@@ -352,8 +360,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-
-    private void hitSecondApi(final int blood_group, final String address)
+    private void hitSecondApi(final int blood_group, final String city)
     {
         dialog.show();
         String url=MyConstants.BASE_URL_API+"users/"+user.getId();
@@ -361,9 +368,11 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         JSONObject json=new JSONObject();
         try
         {
+            user_json.put("picture",user.getPicture_url());
             user_json.put("bgroup",blood_group);
             user_json.put("latitude",latitude);
             user_json.put("longitude",longitude);
+            user_json.put("city",city);
             user_json.put("address",address);
             json.put("user",user_json);
         } catch (JSONException e) {
@@ -395,7 +404,8 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
                 if(response.statusCode==204)
                 {
                     dialog.dismiss();
-                    appendUserLocally(blood_group,address);
+                    appendUserLocally(blood_group,city,address);
+                    location_bg_sent=true;
                     startActivity(new Intent(AfterSplashActivity.this,MainActivity.class));
                     finish();
                 }
@@ -405,11 +415,12 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         MySingleton.getInstance(this).addToRequestQueue(request,"second_tag");
     }
 
-    private void appendUserLocally(int blood_group, String address) {
+    private void appendUserLocally(int blood_group, String city,String address) {
         SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_USER_KEY,MODE_PRIVATE);
         SharedPreferences.Editor editor=shared_prefs.edit();
         editor.putInt("blood_group",blood_group);
         editor.putString("address",address);
+        editor.putString("city",city);
         editor.putString("latitude",Double.valueOf(latitude).toString());
         editor.putString("longitude",Double.valueOf(longitude).toString());
         editor.apply();
@@ -444,7 +455,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
             dialog.dismiss();
     }
 
-    class AddressResultReceiver extends ResultReceiver
+    private class AddressResultReceiver extends ResultReceiver
     {
         AddressResultReceiver(Handler handler) {
             super(handler);
@@ -454,7 +465,10 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             region_progress_bar.setVisibility(View.INVISIBLE);
             if(resultCode==MyConstants.SUCCESS_RESULT)
+            {
                 region_edittext.setText(resultData.getString(MyConstants.RESULT_DATA_KEY));
+                address=resultData.getString(MyConstants.ADDRESS_DATA_KEY);
+            }
             else
             {
                 if(!resultData.getString(MyConstants.RESULT_DATA_KEY).equals(getResources().getString(R.string.invalid_lat_lng)))
