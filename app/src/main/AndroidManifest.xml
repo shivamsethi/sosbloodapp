@@ -60,7 +60,7 @@
                 <action android:name="android.intent.action.VIEW" />
 
                 <data
-                    android:host="www.sosbloodapp.com"
+                    android:host="sosbloodapp.com"
                     android:scheme="http" />
                 <data
                     android:host="www.sosbloodapp.com"
