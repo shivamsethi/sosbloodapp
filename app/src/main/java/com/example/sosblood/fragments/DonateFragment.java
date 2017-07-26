@@ -1,28 +1,57 @@
 package com.example.sosblood.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.sosblood.R;
-import com.example.sosblood.activities.DonateFilterActivity;
-import com.example.sosblood.utils.CustomSpinnerAdapter;
-import com.example.sosblood.widgets.MySpinner;
+import com.example.sosblood.activities.NeedyDetailActivity;
+import com.example.sosblood.models.NeedyPerson;
+import com.example.sosblood.models.User;
+import com.example.sosblood.others.MyConstants;
+import com.example.sosblood.others.MySingleton;
+import com.example.sosblood.utils.CommonTasks;
+import com.example.sosblood.utils.JSONParser;
+import com.example.sosblood.utils.NeedyCardAdapter;
 
-import java.util.Arrays;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DonateFragment extends Fragment {
 
-    private LinearLayout filter_lin_lay;
-    private MySpinner sort_spinner;
+    private RecyclerView recycler_view;
+    private TextView no_requests_textview;
+    private DonateToMainListener listener;
+    private User user;
+    private List<NeedyPerson> needy_persons;
+    private ProgressBar progress_bar;
+    private NeedyCardAdapter adapter;
+
+    public interface DonateToMainListener{
+        public User getCurrentUserInDonate();
+    }
 
     public DonateFragment() {
     }
@@ -31,53 +60,117 @@ public class DonateFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view=inflater.inflate(R.layout.fragment_donate, container, false);
 
-        filter_lin_lay=(LinearLayout)view.findViewById(R.id.filter_lin_lay_id);
-        sort_spinner =(MySpinner)view.findViewById(R.id.sort_spinner_id);
+        recycler_view=(RecyclerView)view.findViewById(R.id.recycler_view_id);
+        no_requests_textview=(TextView)view.findViewById(R.id.no_requests_textview_id);
+        progress_bar=(ProgressBar)view.findViewById(R.id.progress_bar_id);
 
-        List<String> sort_entries= Arrays.asList(getResources().getStringArray(R.array.sorting_donor_entries));
-        CustomSpinnerAdapter adapter=new CustomSpinnerAdapter(getActivity(),sort_entries,"Sort by");
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        sort_spinner.setAdapter(adapter);
-        sort_spinner.setPrompt("Sort by");
+        if(listener!=null)
+            user=listener.getCurrentUserInDonate();
 
-        filter_lin_lay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getActivity(), DonateFilterActivity.class));
-            }
-        });
+        setupRecycler();
 
-        SpinnerInteractionListener spinner_listener=new SpinnerInteractionListener();
-        sort_spinner.setOnItemSelectedListener(spinner_listener);
-        sort_spinner.setOnTouchListener(spinner_listener);
+        fetchNeedyPeople(1);
 
         return view;
     }
 
+    private void setupRecycler() {
+        needy_persons=new ArrayList<>();
+        adapter=new NeedyCardAdapter(needy_persons,getActivity());
+        recycler_view.setAdapter(adapter);
 
+        LinearLayoutManager manager=new LinearLayoutManager(getActivity());
+        recycler_view.setLayoutManager(manager);
 
-    public class SpinnerInteractionListener implements AdapterView.OnItemSelectedListener,View.OnTouchListener {
-
-        boolean user_selected=false;
-
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            user_selected=true;
-            return false;
-        }
-
-        @Override
-        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            if(user_selected)
-            {
-                Toast.makeText(getActivity(), ""+i, Toast.LENGTH_SHORT).show();
+        adapter.setListener(new NeedyCardAdapter.NeedyToHomeListener() {
+            @Override
+            public void onClick(int position) {
+                Bundle bundle=new Bundle();
+                bundle.putString("request_id",needy_persons.get(position).getNeedy_id());
+                bundle.putString("access_token",user.getAccess_token());
+                Intent intent=new Intent(getActivity(), NeedyDetailActivity.class);
+                intent.putExtra("needy_person",bundle);
+                startActivity(intent);
             }
-        }
-
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
-
-        }
+        });
     }
 
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        listener=(DonateToMainListener)activity;
+    }
+
+    private void fetchNeedyPeople(final int page_num) {
+        String url= MyConstants.BASE_URL_API+"blood_requests/find_by_latlng";
+
+        JSONObject blood_req_json=new JSONObject();
+        JSONObject json=new JSONObject();
+        try
+        {
+            blood_req_json.put("latitude",user.getLatitude());
+            blood_req_json.put("longitude",user.getLongitude());
+            json.put("blood_request",blood_req_json);
+            json.put("num_posts",1);
+            json.put("page_num",page_num);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final JsonObjectRequest request=new JsonObjectRequest(Request.Method.POST, url,json, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                List<NeedyPerson> needy_temp;
+
+                try
+                {
+                    JSONArray array=response.getJSONArray("blood_requests");
+                    needy_temp= JSONParser.fetchNeedyPersons(array,getActivity());
+                    for(int i=0;i<needy_temp.size();i++)
+                    {
+                        needy_persons.add(needy_temp.get(i));
+                    }
+                    refreshListView();
+                    if(needy_temp.size()<1) {
+                        progress_bar.setVisibility(View.INVISIBLE);
+                        if(page_num==1 && needy_temp.size()==0) {
+                            no_requests_textview.setVisibility(View.VISIBLE);
+                        }
+                    }else{
+                        fetchNeedyPeople(page_num+1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+
+                if(!CommonTasks.isNetworkAvailable(getActivity()))
+                    Toast.makeText(getActivity(), "Network connectivity problem", Toast.LENGTH_SHORT).show();
+
+                Log.v("yo",error.getLocalizedMessage()+"\n"+error.getMessage()+"\n"+error.toString());
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> headers=new HashMap<>();
+                headers.put("Content-Type","application/json");
+                headers.put("Authorization",user.getAccess_token());
+                return headers;
+            }
+        };
+        request.setRetryPolicy(new DefaultRetryPolicy(20000,DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
+        MySingleton.getInstance(getActivity()).addToRequestQueue(request,"home");
+    }
+
+    private void refreshListView() {
+        adapter.notifyDataSetChanged();
+        recycler_view.invalidate();
+    }
 }

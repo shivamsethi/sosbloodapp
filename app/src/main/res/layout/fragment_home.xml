@@ -22,13 +22,24 @@
             android:paddingRight="1dp"
             android:paddingBottom="1dp">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:src="@drawable/sos"
-                android:scaleType="fitXY"
-                android:clickable="true"
-                android:id="@+id/image_view_id"/>
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="fitXY"
+                    android:clickable="true"
+                    android:id="@+id/image_view_id"/>
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/image_progress_bar_id"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
 
             <com.example.sosblood.widgets.MyTextView
                 android:layout_width="wrap_content"

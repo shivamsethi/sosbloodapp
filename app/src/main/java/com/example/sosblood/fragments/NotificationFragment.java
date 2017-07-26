@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.example.sosblood.R;
 import com.example.sosblood.activities.DonorDetailActivity;
+import com.example.sosblood.activities.WebViewActivity;
 import com.example.sosblood.models.SOSNotification;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.utils.NotificationCardAdapter;
@@ -85,6 +86,14 @@ public class NotificationFragment extends Fragment {
                         startActivity(intent);
                         break;
                     }
+                    case "ginapp":
+                    {
+                        markNotificationClicked(position);
+                        Intent intent1=new Intent(getActivity(),WebViewActivity.class);
+                        intent1.putExtra("url","https://www.goo.gl/"+notifications.get(position).getId());
+                        startActivity(intent1);
+                        break;
+                    }
                 }
             }
         });
@@ -108,6 +117,7 @@ public class NotificationFragment extends Fragment {
             notification.setId(shared_prefs.getString("id_"+i,null));
             notification.setType(shared_prefs.getString("notification_type_"+i,null));
             notification.setClicked(shared_prefs.getBoolean("notification_clicked_"+i,false));
+            notification.setTitle(shared_prefs.getString("title_"+i,""));
             notifications.add(notification);
         }
     }

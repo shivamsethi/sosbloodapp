@@ -28,6 +28,7 @@ import com.example.sosblood.R;
 import com.example.sosblood.models.User;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
+import com.example.sosblood.utils.CommonTasks;
 import com.example.sosblood.utils.JSONParser;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -130,7 +131,6 @@ public class SplashActivity extends AppCompatActivity {
                 Toast.makeText(SplashActivity.this,error.toString()+"\n"+error.getMessage()+"\n"+error.getLocalizedMessage(), Toast.LENGTH_LONG).show();
                 Log.v("yo","Error "+error.toString()+"\n"+error.getMessage()+"\n"+error.getLocalizedMessage());
                 error.printStackTrace();
-
             }
         });
 
@@ -210,12 +210,7 @@ public class SplashActivity extends AppCompatActivity {
 
                 dialog.dismiss();
 
-                Intent intent=new Intent(SplashActivity.this,AfterSplashActivity.class);
-                intent.putExtra(USER_PASSING_TAG,bundle);
-                startActivity(intent);
-                finish();
-
-                /*if(user.getBlood_group()==null)
+                if(user.getBlood_group()==null)
                 {
                     Intent intent=new Intent(SplashActivity.this,AfterSplashActivity.class);
                     intent.putExtra(USER_PASSING_TAG,bundle);
@@ -226,8 +221,7 @@ public class SplashActivity extends AppCompatActivity {
                     Intent intent=new Intent(SplashActivity.this,MainActivity.class);
                     startActivity(intent);
                     finish();
-                }*/
-
+                }
             }
         }, new Response.ErrorListener() {
             @Override
@@ -235,6 +229,12 @@ public class SplashActivity extends AppCompatActivity {
                 error.printStackTrace();
 
                 Log.v("yo",error.getMessage()+"\n"+error.getLocalizedMessage()+"\n"+error.toString());
+
+                if(!CommonTasks.isNetworkAvailable(SplashActivity.this))
+                    Toast.makeText(SplashActivity.this, "Network connectivity problem", Toast.LENGTH_SHORT).show();
+
+                if(CommonTasks.isWifi(SplashActivity.this))
+                    Toast.makeText(SplashActivity.this, "Make sure your wifi connection has active internet.", Toast.LENGTH_SHORT).show();
 
                 dialog.dismiss();
                 NetworkResponse response=error.networkResponse;

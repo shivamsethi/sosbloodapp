@@ -93,24 +93,86 @@ public class JSONParser {
 
         for(int i=0;i<array.length();i++)
         {
+
+            NeedyPerson needy_person=new NeedyPerson();
+            JSONObject obj=new JSONObject();
+            try{
+                obj=array.getJSONObject(i);
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setCreation_time(obj.getString("created_at"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setPicture_url(obj.getString("picture"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setLast_name(obj.getString("last_name"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setCity(obj.getString("city"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setAddress(obj.getString("address"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setNote(obj.getString("note"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setBlood_group(obj.getInt("bgroup"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setNeedy_id(obj.getString("id"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
+            try{
+                needy_person.setFirst_name(obj.getString("first_name"));
+            }catch(JSONException e)
+            {
+                e.printStackTrace();
+            }
+
             try
             {
-                NeedyPerson needy_person=new NeedyPerson();
-                JSONObject obj=array.getJSONObject(i);
-                needy_person.setFirst_name(obj.getString("first_name"));
-                needy_person.setNeedy_id(obj.getString("id"));
-                needy_person.setNote(obj.getString("note"));
-                needy_person.setBlood_group(obj.getInt("bgroup"));
-                needy_person.setAddress(obj.getString("address"));
-                needy_person.setCity(obj.getString("city"));
-                needy_person.setLast_name(obj.getString("last_name"));
-                needy_person.setPicture_url(obj.getString("picture"));
-                needy_person.setCreation_time(obj.getString("created_at"));
-
-                needy_persons.add(needy_person);
+                needy_person.setSomeone_else(obj.getBoolean("someone_else"));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            needy_persons.add(needy_person);
         }
         return needy_persons;
     }
@@ -120,6 +182,12 @@ public class JSONParser {
 
         try{
             needy_person.setCity(obj.getString("city"));
+        }catch(JSONException e){
+            e.printStackTrace();
+        }
+
+        try{
+            needy_person.setSomeone_else(obj.getBoolean("someone_else"));
         }catch(JSONException e){
             e.printStackTrace();
         }

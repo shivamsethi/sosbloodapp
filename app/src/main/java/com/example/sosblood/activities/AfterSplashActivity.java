@@ -41,6 +41,7 @@ import com.example.sosblood.models.User;
 import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
+import com.example.sosblood.utils.CommonTasks;
 import com.example.sosblood.utils.CustomSpinnerAdapter;
 import com.example.sosblood.utils.FetchAddressIntentService;
 import com.example.sosblood.widgets.MySpinner;
@@ -156,6 +157,10 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
             public void onErrorResponse(VolleyError error) {
                 dp_progress_bar.setVisibility(View.INVISIBLE);
                 Toast.makeText(AfterSplashActivity.this, "Can't load Photo", Toast.LENGTH_SHORT).show();
+
+                if(!CommonTasks.isNetworkAvailable(AfterSplashActivity.this))
+                    Toast.makeText(AfterSplashActivity.this, "Network connectivity problem", Toast.LENGTH_SHORT).show();
+
                 Log.v("yo",""+error.getLocalizedMessage());
                 Log.v("yo",""+error.getMessage());
                 Log.v("yo",""+error.toString());
@@ -379,6 +384,8 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
             e.printStackTrace();
         }
 
+        Log.v("yo",user_json.toString());
+
         JsonObjectRequest request=new JsonObjectRequest(Request.Method.PUT, url, json, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -388,6 +395,10 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+
+                if(!CommonTasks.isNetworkAvailable(AfterSplashActivity.this))
+                    Toast.makeText(AfterSplashActivity.this, "Network connectivity problem", Toast.LENGTH_SHORT).show();
+
                 dialog.dismiss();
             }
         }){

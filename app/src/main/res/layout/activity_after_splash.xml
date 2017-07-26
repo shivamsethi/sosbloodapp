@@ -49,6 +49,12 @@
             android:spinnerMode="dialog"
             android:theme="@style/MyWidgetTheme"/>
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#000"
+            android:id="@+id/line_view_id"/>
+
     </LinearLayout>
 
     <RelativeLayout

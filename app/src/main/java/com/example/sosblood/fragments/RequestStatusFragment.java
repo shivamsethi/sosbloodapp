@@ -32,6 +32,7 @@ import com.example.sosblood.models.Donor;
 import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
+import com.example.sosblood.utils.CommonTasks;
 import com.example.sosblood.utils.DonorCardAdapter;
 import com.example.sosblood.utils.JSONParser;
 
@@ -108,6 +109,12 @@ public class RequestStatusFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+
+                if(!CommonTasks.isNetworkAvailable(getActivity())){
+                    Toast.makeText(getActivity(), "Network connectivity problem", Toast.LENGTH_SHORT).show();
+                    request_info_progress_bar.setVisibility(View.INVISIBLE);
+                }
+
                 Log.v("yo",error.getLocalizedMessage()+"\n"+error.getMessage()+"\n"+error.toString());
             }
         }){
@@ -148,6 +155,12 @@ public class RequestStatusFragment extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+
+                if(!CommonTasks.isNetworkAvailable(getActivity())){
+                    Toast.makeText(getActivity(), "Network connectivity problem", Toast.LENGTH_SHORT).show();
+                    responses_progress_bar.setVisibility(View.INVISIBLE);
+                }
+
                 Log.v("yo",error.getLocalizedMessage()+"\n"+error.getMessage()+"\n"+error.toString());
             }
         }){

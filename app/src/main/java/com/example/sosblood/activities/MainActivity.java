@@ -57,7 +57,7 @@ import java.util.Map;
 
 import io.fabric.sdk.android.Fabric;
 
-public class MainActivity extends AppCompatActivity implements RequestGenerateFragment.RequestGenerateToMainListener,HomeFragment.HomeToMainListener{
+public class MainActivity extends AppCompatActivity implements RequestGenerateFragment.RequestGenerateToMainListener,HomeFragment.HomeToMainListener,DonateFragment.DonateToMainListener{
 
     private TabHost tab_host;
     private TabHost.TabSpec tab_spec;
@@ -101,18 +101,6 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
         UAirship.shared().getPushManager().setUserNotificationsEnabled(true);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -141,24 +129,6 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
         LocalBroadcastManager locationBroadcastManager = LocalBroadcastManager.getInstance(this);
         locationBroadcastManager.unregisterReceiver(channelIdUpdateReceiver);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     private void getUserDataFromSharedPrefs() {
         SharedPreferences shared_prefs=getApplicationContext().getSharedPreferences(MyConstants.SHARED_PREFS_USER_KEY, Context.MODE_PRIVATE);
@@ -403,7 +373,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
     }
 
     @Override
-    public User getCurrentUserinHome() {
+    public User getCurrentUserInHome() {
         return user;
     }
 
@@ -421,14 +391,8 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId())
         {
-            case R.id.webview_item_id:
-                Intent intent1=new Intent(this,WebViewActivity.class);
-                intent1.putExtra("url","https://www.google.com");
-                startActivity(intent1);
-                return true;
-
             case R.id.feedback_item_id:
-                String[] to={"shivamsethi2201@gmail.com"};
+                String[] to={"sosbloodapp@gmail.com"};
                 Intent intent = new Intent(Intent.ACTION_SENDTO);
                 intent.setData(Uri.parse("mailto:"));
                 intent.putExtra(Intent.EXTRA_EMAIL, to);
@@ -474,6 +438,8 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
         shared_prefs.edit().clear().apply();
         shared_prefs=getSharedPreferences(MyConstants.SHARED_PREFS_USER_KEY,MODE_PRIVATE);
         shared_prefs.edit().clear().apply();
+        shared_prefs=getSharedPreferences(MyConstants.SHARED_PREFS_NOTIFICATIONS_KEY,MODE_PRIVATE);
+        shared_prefs.edit().clear().apply();
     }
 
     private void cancelRequest()
@@ -488,6 +454,10 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace();
+
+                if(!CommonTasks.isNetworkAvailable(MainActivity.this))
+                    Toast.makeText(MainActivity.this, "Network connectivity problem", Toast.LENGTH_SHORT).show();
+
                 Log.v("yo",error.getLocalizedMessage()+"\n"+error.getMessage()+"\n"+error.toString());
             }
         }){
@@ -517,5 +487,10 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
             }
         };
         MySingleton.getInstance(this).addToRequestQueue(request,"request");
+    }
+
+    @Override
+    public User getCurrentUserInDonate() {
+        return user;
     }
 }

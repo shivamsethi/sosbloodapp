@@ -14,7 +14,7 @@ public final class MyConstants {
 
     public static final String LOCATION_DATA_EXTRA = PACKAGE_NAME + ".LOCATION_DATA_EXTRA";
 
-    public static final String BASE_URL_API="http://dev-api.sosbloodapp.com/v1/";
+    public static final String BASE_URL_API="http://a.sosbloodapp.com/v1/";
 
     public static final String SHARED_PREFS_USER_KEY=PACKAGE_NAME+".SHARED_PREFS_USER";
 

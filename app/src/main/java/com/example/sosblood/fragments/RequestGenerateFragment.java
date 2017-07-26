@@ -40,6 +40,7 @@ import com.example.sosblood.models.User;
 import com.example.sosblood.others.MyApplication;
 import com.example.sosblood.others.MyConstants;
 import com.example.sosblood.others.MySingleton;
+import com.example.sosblood.utils.CommonTasks;
 import com.example.sosblood.utils.CustomSpinnerAdapter;
 import com.example.sosblood.utils.FetchAddressIntentService;
 import com.example.sosblood.widgets.MySpinner;
@@ -76,9 +77,10 @@ public class RequestGenerateFragment extends Fragment {
     private ProgressBar region_progress_bar;
     private AddressResultReceiver receiver;
     private ProgressDialog progress_dialog;
-    private boolean can_type_city=false;
+    private boolean can_type_city=false,someone_else=false;
     private SparseArray<String> blood_groups;
     private String address;
+    private View line_view;
 
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE=1;
 
@@ -121,6 +123,8 @@ public class RequestGenerateFragment extends Fragment {
         rel_lay_button=(RelativeLayout)view.findViewById(R.id.rel_lay_button_id);
         parent_lin_lay=(LinearLayout)view.findViewById(R.id.parent_lin_lay_id);
         region_progress_bar=(ProgressBar)view.findViewById(R.id.region_progress_bar_id);
+        line_view=view.findViewById(R.id.line_view_id);
+
         progress_dialog=new ProgressDialog(getActivity());
         progress_dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         progress_dialog.setMessage("Requesting...");
@@ -154,10 +158,12 @@ public class RequestGenerateFragment extends Fragment {
                 switch(radioGroup.getCheckedRadioButtonId())
                 {
                     case R.id.myself_radio_button_id:
+                        someone_else=false;
                         hideViews();
                         break;
 
                     case R.id.someone_else_radio_button_id:
+                        someone_else=true;
                         showViews();
                         break;
                 }
@@ -261,6 +267,7 @@ public class RequestGenerateFragment extends Fragment {
             blood_req_json.put("bgroup",bgroup);
             blood_req_json.put("request_type",1);
             blood_req_json.put("note",note);
+            blood_req_json.put("someone_else",someone_else);
             json.put("blood_request",blood_req_json);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -321,6 +328,10 @@ public class RequestGenerateFragment extends Fragment {
                 if(progress_dialog.isShowing())
                     progress_dialog.dismiss();
                 error.printStackTrace();
+
+                if(!CommonTasks.isNetworkAvailable(getActivity()))
+                    Toast.makeText(getActivity(), "Network connectivity problem", Toast.LENGTH_SHORT).show();
+
                 Log.v("yo",error.getLocalizedMessage()+"\n"+error.getMessage()+"\n"+error.toString());
             }
         }){
@@ -341,9 +352,11 @@ public class RequestGenerateFragment extends Fragment {
         blood_group_spinner.setVisibility(View.INVISIBLE);
         region_input_lay.setVisibility(View.INVISIBLE);
         same_region_textview.setVisibility(View.INVISIBLE);
+        line_view.setVisibility(View.INVISIBLE);
         try
         {
             ((ViewGroup)blood_group_spinner.getParent()).removeView(blood_group_spinner);
+            ((ViewGroup)line_view.getParent()).removeView(line_view);
             ((ViewGroup)rel_lay_region.getParent()).removeView(rel_lay_region);
         }catch (NullPointerException e)
         {
@@ -354,11 +367,13 @@ public class RequestGenerateFragment extends Fragment {
     private void showViews()
     {
         blood_group_spinner.setVisibility(View.VISIBLE);
+        line_view.setVisibility(View.VISIBLE);
         region_input_lay.setVisibility(View.VISIBLE);
         same_region_textview.setVisibility(View.VISIBLE);
         ((ViewGroup)rel_lay_button.getParent()).removeView(rel_lay_button);
         ((ViewGroup)note_input_lay.getParent()).removeView(note_input_lay);
         parent_lin_lay.addView(blood_group_spinner);
+        parent_lin_lay.addView(line_view);
         parent_lin_lay.addView(rel_lay_region);
         parent_lin_lay.addView(note_input_lay);
         parent_lin_lay.addView(rel_lay_button);
