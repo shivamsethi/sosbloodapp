@@ -396,7 +396,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
         switch(item.getItemId())
         {
             case R.id.feedback_item_id:
-                String[] to={"sosbloodapp@gmail.com"};
+                String[] to={"founders@sosbloodapp.com"};
                 Intent intent = new Intent(Intent.ACTION_SENDTO);
                 intent.setData(Uri.parse("mailto:"));
                 intent.putExtra(Intent.EXTRA_EMAIL, to);
