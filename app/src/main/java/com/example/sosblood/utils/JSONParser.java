@@ -42,6 +42,14 @@ public class JSONParser {
 
         try
         {
+            user.setCity(object.getString("city"));
+        }catch(JSONException e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
             user.setBlood_group(object.getInt("bgroup"));
         }catch(JSONException e)
         {

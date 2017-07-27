@@ -91,20 +91,6 @@ public class HomeFragment extends Fragment {
 
         fetchNearNeedyPeople();
 
-        invite_imageview.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(share_message!=null)
-                {
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.putExtra(Intent.EXTRA_STREAM,getImageUri(getActivity(),((BitmapDrawable)(invite_imageview.getDrawable())).getBitmap()));
-                    intent.putExtra(Intent.EXTRA_TEXT,share_message);
-                    intent.setType("*/*");
-                    startActivity(Intent.createChooser(intent,"Select app..."));
-                }
-            }
-        });
-
         swipe_refresh_layout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -165,6 +151,19 @@ public class HomeFragment extends Fragment {
                 image_progress_bar.setVisibility(View.INVISIBLE);
                 invite_imageview.setImageBitmap(response);
                 swipe_refresh_layout.setRefreshing(false);
+                invite_imageview.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if(share_message!=null)
+                        {
+                            Intent intent = new Intent(Intent.ACTION_SEND);
+                            intent.putExtra(Intent.EXTRA_STREAM,getImageUri(getActivity(),((BitmapDrawable)(invite_imageview.getDrawable())).getBitmap()));
+                            intent.putExtra(Intent.EXTRA_TEXT,share_message);
+                            intent.setType("*/*");
+                            startActivity(Intent.createChooser(intent,"Select app..."));
+                        }
+                    }
+                });
             }
         }, 0, 0, null, new Response.ErrorListener() {
             @Override

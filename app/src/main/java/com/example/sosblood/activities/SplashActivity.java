@@ -190,6 +190,8 @@ public class SplashActivity extends AppCompatActivity {
             @Override
             public void onResponse(JSONObject response) {
 
+                Log.v("yo",response.toString());
+
                 User user= JSONParser.parseFbLogin(response);
                 user.setPicture_url(profile_pic_url);
 
@@ -209,6 +211,11 @@ public class SplashActivity extends AppCompatActivity {
                 bundle.putSerializable(USER_PASSING_TAG,user);
 
                 dialog.dismiss();
+
+//                Intent intent=new Intent(SplashActivity.this,AfterSplashActivity.class);
+//                intent.putExtra(USER_PASSING_TAG,bundle);
+//                startActivity(intent);
+//                finish();
 
                 if(user.getBlood_group()==null)
                 {
@@ -313,6 +320,7 @@ public class SplashActivity extends AppCompatActivity {
         {
             editor.putInt("blood_group",user.getBlood_group());
             editor.putString("address",user.getAddress());
+            editor.putString("city",user.getCity());
         }
         if(user.getLatitude()!=null)
         {
