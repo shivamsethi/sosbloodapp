@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.LocalBroadcastManager;
@@ -56,6 +58,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.fabric.sdk.android.Fabric;
+
+import static com.example.sosblood.fragments.HomeFragment.STORAGE_PERMISSION_REQUEST_CODE;
 
 public class MainActivity extends AppCompatActivity implements RequestGenerateFragment.RequestGenerateToMainListener,HomeFragment.HomeToMainListener,DonateFragment.DonateToMainListener{
 
@@ -487,6 +491,26 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
             }
         };
         MySingleton.getInstance(this).addToRequestQueue(request,"request");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode)
+        {
+            case STORAGE_PERMISSION_REQUEST_CODE:
+
+                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
+                {
+                    HomeFragment home_fragment=(HomeFragment)getSupportFragmentManager().findFragmentByTag("home");
+                    if(home_fragment!=null && home_fragment.isVisible())
+                        home_fragment.setupImageClickShare();
+                }
+                else
+                {
+                    Toast.makeText(this, "You denied the storage permission. Now you can't share this home image to your friends.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
     }
 
     @Override

@@ -1,15 +1,21 @@
 package com.example.sosblood.fragments;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -58,6 +64,7 @@ public class HomeFragment extends Fragment {
     private ImageView invite_imageview;
     private SwipeRefreshLayout swipe_refresh_layout;
     private String share_message=null;
+    public static final int STORAGE_PERMISSION_REQUEST_CODE=1;
 
     public interface HomeToMainListener{
         User getCurrentUserInHome();
@@ -151,19 +158,7 @@ public class HomeFragment extends Fragment {
                 image_progress_bar.setVisibility(View.INVISIBLE);
                 invite_imageview.setImageBitmap(response);
                 swipe_refresh_layout.setRefreshing(false);
-                invite_imageview.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if(share_message!=null)
-                        {
-                            Intent intent = new Intent(Intent.ACTION_SEND);
-                            intent.putExtra(Intent.EXTRA_STREAM,getImageUri(getActivity(),((BitmapDrawable)(invite_imageview.getDrawable())).getBitmap()));
-                            intent.putExtra(Intent.EXTRA_TEXT,share_message);
-                            intent.setType("*/*");
-                            startActivity(Intent.createChooser(intent,"Select app..."));
-                        }
-                    }
-                });
+                handleStoragePermissions();
             }
         }, 0, 0, null, new Response.ErrorListener() {
             @Override
@@ -174,6 +169,49 @@ public class HomeFragment extends Fragment {
             }
         });
         MySingleton.getInstance(getActivity()).addToRequestQueue(request,"home_image");
+    }
+
+    private void handleStoragePermissions() {
+        int permission= ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(permission== PackageManager.PERMISSION_DENIED)
+        {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            {
+                AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
+                builder.setTitle("Alert");
+                builder.setMessage("SOS Blood offers you to share this app with your friends with the home picture over messengers like WhatsApp. For this,storage permission is required. Kindly click on Allow in the next step.");
+                builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},STORAGE_PERMISSION_REQUEST_CODE);
+                    }
+                });
+                AlertDialog dialog1=builder.create();
+                dialog1.show();
+            }
+            else
+            {
+                ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},STORAGE_PERMISSION_REQUEST_CODE);
+            }
+        }
+        else if(permission==PackageManager.PERMISSION_GRANTED)
+            setupImageClickShare();
+    }
+
+    public void setupImageClickShare() {
+        invite_imageview.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(share_message!=null)
+                {
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.putExtra(Intent.EXTRA_STREAM,getImageUri(getActivity(),((BitmapDrawable)(invite_imageview.getDrawable())).getBitmap()));
+                    intent.putExtra(Intent.EXTRA_TEXT,share_message);
+                    intent.setType("*/*");
+                    startActivity(Intent.createChooser(intent,"Select app..."));
+                }
+            }
+        });
     }
 
     private void fetchNearNeedyPeople() {
