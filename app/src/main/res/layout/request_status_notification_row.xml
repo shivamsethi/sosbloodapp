@@ -12,7 +12,7 @@
         android:src="@drawable/insta"
         android:id="@+id/request_notif_imageview_id"/>
 
-    <com.example.sosblood.widgets.MyTextView
+    <com.shivam.sosblood.widgets.MyTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Shivam Sethi is willing to donate you blood. Click to contact him."

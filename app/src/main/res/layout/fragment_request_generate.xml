@@ -14,7 +14,7 @@
         android:animateLayoutChanges="true"
         android:id="@+id/parent_lin_lay_id">
 
-        <com.example.sosblood.widgets.MyTextView
+        <com.shivam.sosblood.widgets.MyTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="I need blood for"
@@ -46,7 +46,7 @@
 
         </RadioGroup>
 
-        <com.example.sosblood.widgets.MySpinner
+        <com.shivam.sosblood.widgets.MySpinner
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:id="@+id/spinner_blood_group_id"
@@ -84,10 +84,9 @@
 
             </android.support.design.widget.TextInputLayout>
 
-            <com.example.sosblood.widgets.MyTextView
+            <com.shivam.sosblood.widgets.MyTextView
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
-                android:text="@string/same_as_mine"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="8dp"
                 android:textAlignment="center"
@@ -119,7 +118,7 @@
                 android:id="@+id/note_edittext_id"
                 android:inputType="textMultiLine"
                 android:background="@android:drawable/edit_text"
-                android:hint=" Note(optional)..."
+                android:hint=" Where? Why? How urgent? (optional note)"
                 android:gravity="start" />
 
         </android.support.design.widget.TextInputLayout>
@@ -129,7 +128,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/rel_lay_button_id">
 
-            <com.example.sosblood.widgets.MyButton
+            <com.shivam.sosblood.widgets.MyButton
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Request"

@@ -5,25 +5,40 @@
     android:orientation="vertical"
     android:padding="7dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <com.example.sosblood.widgets.MyTextView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textAlignment="center"
-            android:gravity="center"
-            android:textSize="18sp"
-            android:id="@+id/request_info_textview_id"/>
+            android:layout_height="wrap_content">
 
-        <ProgressBar
+            <com.shivam.sosblood.widgets.MyTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:textSize="18sp"
+                android:id="@+id/request_info_textview_id"/>
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/request_info_progress_bar_id"
+                android:layout_centerInParent="true" />
+
+        </RelativeLayout>
+
+        <com.shivam.sosblood.widgets.MyTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/request_info_progress_bar_id"
-            android:layout_centerInParent="true" />
+            android:text="@string/stop_showing_request_text"
+            android:textColor="#ff0000"
+            android:layout_gravity="end"
+            android:id="@+id/disable_request_textview_id"/>
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"
@@ -31,7 +46,7 @@
         android:background="#000"
         android:layout_marginTop="3dp"/>
 
-    <com.example.sosblood.widgets.MyTextView
+    <com.shivam.sosblood.widgets.MyTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Responses"
@@ -57,7 +72,7 @@
 
     </RelativeLayout>
 
-    <com.example.sosblood.widgets.MyTextView
+    <com.shivam.sosblood.widgets.MyTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No Response yet"
