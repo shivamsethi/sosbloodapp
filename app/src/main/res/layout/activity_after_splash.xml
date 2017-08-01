@@ -109,11 +109,11 @@
                 android:layout_height="match_parent"
                 android:background="@drawable/bottom_bar_bg"
                 android:text="BACK"
+                android:id="@+id/button_back_id"
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_weight="1"
                 android:textSize="14sp"
-                android:textColor="#fff"
-                android:onClick="actButtonBack"/>
+                android:textColor="#fff"/>
 
             <View
                 android:layout_width="1dp"
@@ -127,10 +127,10 @@
                 android:background="@drawable/bottom_bar_bg"
                 android:text="NEXT"
                 android:textSize="14sp"
+                android:id="@+id/button_next_id"
                 style="?android:attr/buttonBarButtonStyle"
                 android:layout_weight="1"
-                android:textColor="#fff"
-                android:onClick="actButtonNext"/>
+                android:textColor="#fff"/>
 
         </LinearLayout>
 

@@ -22,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.SparseArray;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -85,6 +86,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
     private double latitude,longitude;
     private boolean can_type_city=false,location_bg_sent=false;
     private String address;
+    private Button button_next,button_back;
 
     private static final int REQUEST_LOCATION_SETTINGS=1;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE=2;
@@ -108,6 +110,9 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         region_input_lay=(TextInputLayout)findViewById(R.id.region_input_lay_id);
         region_edittext=(EditText)findViewById(R.id.region_edittext_id);
         region_progress_bar=(ProgressBar)findViewById(R.id.region_progress_bar_id);
+        button_back=(Button)findViewById(R.id.button_back_id);
+        button_next=(Button)findViewById(R.id.button_next_id);
+
         dialog=new ProgressDialog(this);
 
         region_input_lay.setTypeface(Typeface.createFromAsset(getAssets(),"Roboto-Regular.ttf"));
@@ -115,6 +120,20 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         dialog.setMessage("Just a moment...");
         dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         dialog.setCancelable(false);
+
+        button_back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actButtonBack();
+            }
+        });
+
+        button_next.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actButtonNext();
+            }
+        });
 
         region_edittext.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -329,7 +348,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         }
     }
 
-    public void actButtonBack(View view) {
+    public void actButtonBack() {
         super.onBackPressed();
         LoginManager.getInstance().logOut();
     }
@@ -340,7 +359,7 @@ public class AfterSplashActivity extends AppCompatActivity implements GoogleApiC
         LoginManager.getInstance().logOut();
     }
 
-    public void actButtonNext(View view) {
+    public void actButtonNext() {
         if(blood_group_spinner.getSelectedItemPosition()!=0)
         {
             if(!region_edittext.getText().toString().isEmpty())

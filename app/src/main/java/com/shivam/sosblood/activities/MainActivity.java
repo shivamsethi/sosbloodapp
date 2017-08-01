@@ -390,6 +390,44 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
     }
 
     @Override
+    public void setupShareImage() {
+        handleStoragePermissionsForShareImage();
+    }
+
+    private void handleStoragePermissionsForShareImage() {
+        int permission= ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if(permission== PackageManager.PERMISSION_DENIED)
+        {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.WRITE_EXTERNAL_STORAGE))
+            {
+                AlertDialog.Builder builder=new AlertDialog.Builder(this);
+                builder.setTitle("Alert");
+                builder.setMessage("SOS Blood offers you to share this app with your friends with the home picture over messengers like WhatsApp. For this,storage permission is required. Kindly click on Allow in the next step.");
+                builder.setNeutralButton("OKAY", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},STORAGE_PERMISSION_REQUEST_CODE);
+                    }
+                });
+                AlertDialog dialog1=builder.create();
+                dialog1.show();
+            }
+            else
+            {
+                ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},STORAGE_PERMISSION_REQUEST_CODE);
+            }
+        }
+        else if(permission==PackageManager.PERMISSION_GRANTED)
+            setupImageClickShare();
+    }
+
+    private void setupImageClickShare() {
+        HomeFragment home_fragment=(HomeFragment)getSupportFragmentManager().findFragmentByTag("home");
+        if(home_fragment!=null && home_fragment.isVisible())
+            home_fragment.setupImageClick();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu,menu);
 
@@ -493,9 +531,7 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
                 if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
                 {
-                    HomeFragment home_fragment=(HomeFragment)getSupportFragmentManager().findFragmentByTag("home");
-                    if(home_fragment!=null && home_fragment.isVisible())
-                        home_fragment.setupImageClickShare();
+                    setupImageClickShare();
                 }
                 else
                 {
@@ -534,10 +570,10 @@ public class MainActivity extends AppCompatActivity implements RequestGenerateFr
 
     @Override
     public void setupShareRequest() {
-        handleStoragePermissions();
+        handleStoragePermissionsForShareRequest();
     }
 
-    private void handleStoragePermissions() {
+    private void handleStoragePermissionsForShareRequest() {
         int permission= ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if(permission== PackageManager.PERMISSION_DENIED)
         {
