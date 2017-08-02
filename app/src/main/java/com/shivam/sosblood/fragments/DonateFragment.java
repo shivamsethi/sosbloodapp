@@ -150,7 +150,7 @@ public class DonateFragment extends Fragment {
 
                 if(!CommonTasks.isNetworkAvailable(getActivity()))
                     Toast.makeText(getActivity(), "Network connectivity problem", Toast.LENGTH_SHORT).show();
-
+                else Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         }){
             @Override
