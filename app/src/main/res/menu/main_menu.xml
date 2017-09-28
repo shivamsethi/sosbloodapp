@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:title="Feedback"
+        android:id="@+id/feedback_item_id"
+        app:showAsAction="never"/>
+
+    <item
+        android:title="Logout"
+        android:id="@+id/logout_item_id"
+        app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/share_item_id"
+        app:showAsAction="ifRoom"
+        android:title="Share"
+        android:visible="false"
+        android:icon="@drawable/ic_share_white_24dp"/>
+
+    <item
+        android:title="Delete Request"
+        android:id="@+id/cancel_request_item_id"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_delete_white_24dp"/>
+
+</menu>

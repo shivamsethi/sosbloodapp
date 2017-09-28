@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "644407995092",
+    "firebase_url": "https://sos-blood-1486306792287.firebaseio.com",
+    "project_id": "sos-blood-1486306792287",
+    "storage_bucket": "sos-blood-1486306792287.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:644407995092:android:49032170a9ceda86",
+        "android_client_info": {
+          "package_name": "com.shivam.sosblood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "644407995092-e8238drnmmo0asn1lomuphfajf9lmtjp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlyo-OYHYFI3hhR2E-p7CMsPSI2eGsmNo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

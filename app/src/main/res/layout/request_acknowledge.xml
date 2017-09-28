@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="10dp">
+
+    <com.shivam.sosblood.widgets.MyTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BLOOD REQUESTED"
+        android:textSize="23sp"
+        android:textAlignment="center"
+        android:layout_gravity="center_horizontal" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#000"/>
+
+    <com.shivam.sosblood.widgets.MyTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/request_details"
+        android:textSize="19sp"
+        android:layout_marginTop="10dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="4dp">
+
+        <com.shivam.sosblood.widgets.MyTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Blood Group"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+        <com.shivam.sosblood.widgets.MyTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/blood_group_textview_id"
+            android:textSize="15sp"
+            android:gravity="end"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.shivam.sosblood.widgets.MyTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Region"
+            android:textSize="17sp"
+            android:textStyle="bold"/>
+
+        <com.shivam.sosblood.widgets.MyTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/region_textview_id"
+            android:textSize="15sp"
+            android:gravity="end"/>
+
+    </LinearLayout>
+
+    <com.shivam.sosblood.widgets.MyTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:layout_marginTop="10dp"
+        android:text="The notifications about this request status will be shown here. You can anytime cancel this request"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="OKAY"
+        android:id="@+id/okay_button_id"
+        android:background="@drawable/button_bg"
+        android:layout_marginTop="10dp"
+        android:textColor="#fff"/>
+
+</LinearLayout>

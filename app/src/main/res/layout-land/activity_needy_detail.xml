@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:paddingBottom="1dp"
+        android:id="@+id/lin_lay_id">
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:titleTextColor="#fff"
+            android:background="@color/theme_red"
+            android:id="@+id/toolbar_id"/>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/image_view_id"
+                            android:layout_width="100dp"
+                            android:layout_height="100dp" />
+
+                        <ProgressBar
+                            android:id="@+id/progress_bar_id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:visibility="gone" />
+
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:orientation="vertical">
+
+                        <com.shivam.sosblood.widgets.MyTextView
+                            android:id="@+id/name_textview_id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="3dp"
+                            android:textColor="#000"
+                            android:textSize="20sp" />
+
+                        <com.shivam.sosblood.widgets.MyTextView
+                            android:id="@+id/blood_group_textview_id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="17sp" />
+
+                        <com.shivam.sosblood.widgets.MyTextView
+                            android:id="@+id/someone_else_textview_id"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="17sp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <com.shivam.sosblood.widgets.MyTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="City:"
+                        android:textColor="#000"
+                        android:textSize="20sp"/>
+
+                    <com.shivam.sosblood.widgets.MyTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/address_textview_id"/>
+
+                    <com.shivam.sosblood.widgets.MyTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Created:"
+                        android:textColor="#000"
+                        android:layout_marginTop="15dp"
+                        android:textSize="20sp"/>
+
+                    <com.shivam.sosblood.widgets.MyTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/creation_time_textview_id" />
+
+                    <com.shivam.sosblood.widgets.MyTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="20dp"
+                        android:textColor="#000"
+                        android:textSize="25sp"
+                        android:id="@+id/note_head_textview_id"/>
+
+                    <com.shivam.sosblood.widgets.MyTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/note_textview_id"/>
+
+                    <com.shivam.sosblood.widgets.MyTextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAlignment="center"
+                        android:textColor="#000"
+                        android:layout_marginTop="10dp"
+                        android:id="@+id/help_textview_id"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:background="#fff"
+                    android:layout_weight="1"/>
+
+                <com.shivam.sosblood.widgets.MyButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/accept_button_id"
+                    android:background="@drawable/button_bg"
+                    android:text="Accept"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:textColor="#fff"
+                    android:textSize="18sp"
+                    android:onClick="actButtonAccept"/>
+
+            </LinearLayout>
+
+        </ScrollView>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/center_progress_bar_id"
+        android:visibility="visible"/>
+
+</RelativeLayout>
